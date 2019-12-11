@@ -2,6 +2,7 @@ let express = require("express")//引入express模块
 
 let app = express();
 let bodyParser = require("body-parser") //处理post
+let timeStamp = require("time-stamp") // 时间
 var multiparty = require('multiparty');//处理图片上传
 const crypto = require('crypto')//加密
 //设置后台加密内容
@@ -118,7 +119,7 @@ app.post("/userLogin", function (req, res) {
             key: privateKey,
             padding: crypto.constants.RSA_PKCS1_PADDING // 注意这里的常量值要设置为RSA_PKCS1_PADDING
         }, buffer1).toString('utf8');
-         console.log('解密之后的密码', password);
+        console.log('解密之后的密码', password);
 
         let b_password = crypto.createHmac('sha256', secret).update(password).digest("hex")//后端加密
 
@@ -128,57 +129,87 @@ app.post("/userLogin", function (req, res) {
             username
         }, function (er, rs) {
             if (rs) {
-          
-               // res.send('0')
-               console.log(rs.e_mail)
-               if (rs.b_password === b_password) {
-                //密码正确,返回1
-                console.log(rs.b_password,111111111111)//数据库中加密密码
-                console.log(b_password,22222222222)//前端传来的密码，解密后再加密 的密码
-            
-             
-             
-             
-             
-             
-             
-                res.send({
-                    'status':"1",
-                    e_mail:rs.e_mail,
-                    username : rs.username
-                })
+
+                // res.send('0')
+                // console.log(rs.e_mail)
+                if (rs.b_password === b_password) {
+                    //密码正确,返回1
+                    console.log(rs.b_password, 111111111111)//数据库中加密密码
+                    console.log(b_password, 22222222222)//前端传来的密码，解密后再加密 的密码
+
+                    res.send({
+                        'status': "1",
+                        e_mail: rs.e_mail,
+                        username: rs.username
+                    })
+                }
+                else {
+                    //密码错误,返回2
+                    res.send({
+                        'status': "2",
+
+                    })
+                }
             }
             else {
-                //密码错误,返回2
-                res.send({
-                    'status':"2",
-                  
-                })
-            }
-            }
-            else{
                 //未查到该用户,返回0
                 res.send({
-                    'status':"0",
-                  
+                    'status': "0",
+
                 })
             }
-            
+
 
         })
     })
 })
 
-//ip
-app.post('/userip', function(req, res){
+//传递用户信息(浏览器，操作系统信息)
+app.post('/postUserInfo', function (req, res) {
+
+   
+    // console.log("headers = " + JSON.stringify(req.headers));// 包含了各种header，包括x-forwarded-for(如果被代理过的话)
+    // console.log("x-forwarded-for = " + req.header('x-forwarded-for'));// 各阶段ip的CSV, 最左侧的是原始ip
+    // console.log("ips = " + JSON.stringify(req.ips));// 相当于(req.header('x-forwarded-for') || '').split(',')
+    // console.log("remoteAddress = " + req.connection.remoteAddress);// 未发生代理时，请求的ip
+    // console.log("ip = " + req.ip);// 同req.connection.remoteAddress, 但是格式要好一些
     
-    console.log("headers = " + JSON.stringify(req.headers));// 包含了各种header，包括x-forwarded-for(如果被代理过的话)
-    console.log("x-forwarded-for = " + req.header('x-forwarded-for'));// 各阶段ip的CSV, 最左侧的是原始ip
-    console.log("ips = " + JSON.stringify(req.ips));// 相当于(req.header('x-forwarded-for') || '').split(',')
-    console.log("remoteAddress = " + req.connection.remoteAddress);// 未发生代理时，请求的ip
-    console.log("ip = " + req.ip);// 同req.connection.remoteAddress, 但是格式要好一些
-    res.send('Hello World');
-  });
+    let {username,os,digits,browser} = req.body
+    let ip = req.ip.slice(7) 
+    let time =  timeStamp('YYYY-MM-DD:mm:ss')
+
+
+    MongoClient.connect(DBurl, function (err, db) {
+
+        db.collection("userInfo").insertOne({
+            username,os,digits,browser,ip,time
+        },function(er,rs){
+            console.log(rs)
+        })
+
+    })
+    res.send('用户信息获取成功');
+
+});
+
+//获取用户信息
+app.get('/getUserInfo',function(req,res){
+  
+
+       let {username} = req.query
+  
+MongoClient.connect(DBurl,function(err,db){
+    db.collection("userInfo").find({username}).toArray(function(err,result){
+        if(!err){
+            res.send(result)
+        }
+    })
+})
+
+
+
+
+})
 
 
 
