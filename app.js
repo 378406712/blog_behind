@@ -211,6 +211,21 @@ MongoClient.connect(DBurl,function(err,db){
 
 })
 
+//删除用户信息
+app.get('/deleteUserInfo',function(req,res){
+   let {_id }= req.query
+   console.log(ObjectId(_id))
+   MongoClient.connect(DBurl,function(err,db){
+
+    db.collection("userInfo").remove({
+        _id:ObjectId(_id)
+    })
+
+   })
+    res.send('删除成功')
+
+})
+
 
 
 
