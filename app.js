@@ -176,7 +176,7 @@ app.post('/postUserInfo', function (req, res) {
     
     let {username,os,digits,browser} = req.body
     let ip = req.ip.slice(7) 
-    let time =  timeStamp('YYYY-MM-DD:mm:ss')
+    let time =  timeStamp('YYYY-MM-DD HH:mm:ss')
 
 
     MongoClient.connect(DBurl, function (err, db) {
@@ -192,7 +192,7 @@ app.post('/postUserInfo', function (req, res) {
 
 });
 
-//获取用户信息
+//获取用户登录信息
 app.get('/getUserInfo',function(req,res){
   
 
@@ -211,8 +211,9 @@ MongoClient.connect(DBurl,function(err,db){
 
 })
 
-//删除用户信息
+//删除用户登录信息
 app.get('/deleteUserInfo',function(req,res){
+    res.send('123')
    let {_id }= req.query
    console.log(ObjectId(_id))
    MongoClient.connect(DBurl,function(err,db){
@@ -224,6 +225,11 @@ app.get('/deleteUserInfo',function(req,res){
    })
     res.send('删除成功')
 
+})
+
+//修改用户账号密码
+app.post('/userPassAlter',function(req,res){
+    res.send('修改')
 })
 
 
