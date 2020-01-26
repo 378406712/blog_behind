@@ -86,8 +86,8 @@ app.post("/userRegister", function(req, res) {
       },
       function(er, rs) {
         if (rs) {
-          console.log(-1); //用户名重复-1
-          res.send("-1");
+         
+          res.send("-1"); //用户名重复-1
         } else {
           db.collection("register").findOne({ e_mail }, function(e, r) {
             if (r) {
@@ -208,7 +208,6 @@ app.get("/getUserInfo", function(req, res) {
 
 //删除用户登录信息
 app.get("/deleteUserInfo", function(req, res) {
-  res.send("123");
   let { _id } = req.query;
   console.log(ObjectId(_id));
   MongoClient.connect(DBurl, function(err, db) {
@@ -232,8 +231,6 @@ app.post("/userPassAlter", function(req, res) {
         
         if (rs.b_password == b_password1) {
           //update
-          console.log(rs.b_password, 11111);
-          console.log(againPass, 22222);
           db.collection("register").update(
             { 'b_password': rs.b_password },
             { $set: { 'b_password': b_password2 } },
@@ -255,6 +252,18 @@ app.post("/userPassAlter", function(req, res) {
     });
   });
 });
+//删除用户账号
+app.get("/userRemove",function(req,res){
+    let {e_mail} = req.query
+    console.log(e_mail)
+    MongoClient.connect(DBurl,function(err,db){
+        db.collection("register").remove({e_mail},function(er,rs){
+            if(rs){
+              res.send({"status":'0'}) //删除成功
+            }
+        })
+    })
+})
 
 // Promise检错提示
 process.on("unhandledRejection", (reason, p) => {
