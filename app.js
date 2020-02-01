@@ -5,9 +5,11 @@ let bodyParser = require("body-parser"); //处理post
 let timeStamp = require("time-stamp"); // 时间
 var multiparty = require("multiparty"); //处理图片上传
 const crypto = require("crypto"); //加密
+const uuid = require("uuid/v1"); //uuid  随机生成图片名字
 //设置后台加密内容
 const secret = "3123e;lkjfldsjfpsa[ofj";
-
+//引入path
+let path = require("path");
 //后台生成秘钥
 const NodeRSA = require("node-rsa");
 const fs = require("fs");
@@ -63,7 +65,7 @@ function savePass(pwd) {
   return b_password;
 }
 
-app.use("/upload", express.static("upload")); //存放图片的upload文件夹
+// app.use("/upload", express.static("public/upload")); //存放图片的upload文件夹
 app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
@@ -86,7 +88,6 @@ app.post("/userRegister", function(req, res) {
       },
       function(er, rs) {
         if (rs) {
-         
           res.send("-1"); //用户名重复-1
         } else {
           db.collection("register").findOne({ e_mail }, function(e, r) {
@@ -161,22 +162,23 @@ app.post("/userLogin", function(req, res) {
   });
 });
 
-//传递用户信息(浏览器，操作系统信息)
-app.post("/postUserInfo", function(req, res) {
+//传递用户系统信息(浏览器，操作系统信息)
+app.post("/postServerInfo", function(req, res) {
   // console.log("headers = " + JSON.stringify(req.headers));// 包含了各种header，包括x-forwarded-for(如果被代理过的话)
   // console.log("x-forwarded-for = " + req.header('x-forwarded-for'));// 各阶段ip的CSV, 最左侧的是原始ip
   // console.log("ips = " + JSON.stringify(req.ips));// 相当于(req.header('x-forwarded-for') || '').split(',')
   // console.log("remoteAddress = " + req.connection.remoteAddress);// 未发生代理时，请求的ip
   // console.log("ip = " + req.ip);// 同req.connection.remoteAddress, 但是格式要好一些
 
-  let { username, os, digits, browser } = req.body;
+  let { username, e_mail, os, digits, browser } = req.body;
   let ip = req.ip.slice(7);
   let time = timeStamp("YYYY-MM-DD HH:mm:ss");
 
   MongoClient.connect(DBurl, function(err, db) {
-    db.collection("userInfo").insertOne(
+    db.collection("userServerData").insertOne(
       {
         username,
+        e_mail,
         os,
         digits,
         browser,
@@ -191,12 +193,12 @@ app.post("/postUserInfo", function(req, res) {
   res.send("用户信息获取成功");
 });
 
-//获取用户登录信息
-app.get("/getUserInfo", function(req, res) {
+//获取用户系统信息
+app.get("/getServerInfo", function(req, res) {
   let { username } = req.query;
 
   MongoClient.connect(DBurl, function(err, db) {
-    db.collection("userInfo")
+    db.collection("userServerData")
       .find({ username })
       .toArray(function(err, result) {
         if (!err) {
@@ -206,12 +208,12 @@ app.get("/getUserInfo", function(req, res) {
   });
 });
 
-//删除用户登录信息
-app.get("/deleteUserInfo", function(req, res) {
+//删除用户系统信息
+app.get("/deleteServerInfo", function(req, res) {
   let { _id } = req.query;
   console.log(ObjectId(_id));
   MongoClient.connect(DBurl, function(err, db) {
-    db.collection("userInfo").remove({
+    db.collection("userServerData").remove({
       _id: ObjectId(_id)
     });
   });
@@ -228,12 +230,11 @@ app.post("/userPassAlter", function(req, res) {
   MongoClient.connect(DBurl, function(err, db) {
     db.collection("register").findOne({ e_mail }, function(er, rs) {
       if (rs) {
-        
         if (rs.b_password == b_password1) {
           //update
           db.collection("register").update(
-            { 'b_password': rs.b_password },
-            { $set: { 'b_password': b_password2 } },
+            { b_password: rs.b_password },
+            { $set: { b_password: b_password2 } },
 
             function(e, r) {
               if (!e) {
@@ -252,18 +253,92 @@ app.post("/userPassAlter", function(req, res) {
     });
   });
 });
+//添加用户信息
+app.post("/userInfoAdd", function(req, res) {
+ // let birthday = req.body.birthday.slice(0, 10);
+console.log(req.body.nickname)
+  let { username, nickname, sex, desc, hometown, job, fileList } = req.body;
+
+  //非图片信息
+  // MongoClient.connect(DBurl, function(err, db) {
+  //   db.collection("userInfo").findOne({ username }, function(er, rs) {
+  //     if (!rs) {
+  //       db.collection("userInfo").insertOne(
+  //         { username, nickname, desc, sex, hometown, job, birthday, fileList },
+  //         function(er, rs) {
+  //           if (rs) {
+  //             res.send("0"); //用户信息插入成功
+  //           }
+  //         }
+  //       );
+  //     } else {
+  //       db.collection("userInfo").findOneAndUpdate(
+  //         { username },
+  //         {
+  //           username,
+  //           nickname,
+  //           desc,
+  //           sex,
+  //           hometown,
+  //           job,
+  //           birthday,
+  //           fileList
+  //         },
+  //         function(er, rs) {
+  //           if (rs) {
+  //             res.send("1"); //用户信息更新成功
+  //           }
+  //         }
+  //       );
+  //     }
+  //   });
+  // });
+});
+
+//头像信息
+// app.post("/userPicData",function(req,res){
+//   //图片信息
+//   // let form = formidable.IncomingForm()
+//   // form.uploadDir = path.normalize(__dirname + '/public/tempDir')
+//   // form.parse(req,(err,fields,files)=>{
+//   //   let uoLoadFile = files.file;
+//   // })
+//   console.log(req.body,222222)
+// })
+
+//获取用户信息
+app.get("/userInfoData", function(req, res) {
+  let { username } = req.query;
+
+  MongoClient.connect(DBurl, function(err, db) {
+    db.collection("userInfo").findOne({ username }, function(er, rs) {
+      if (rs) {
+        res.send(rs);
+      }
+    });
+  });
+});
 //删除用户账号
-app.get("/userRemove",function(req,res){
-    let {e_mail} = req.query
-    console.log(e_mail)
-    MongoClient.connect(DBurl,function(err,db){
-        db.collection("register").remove({e_mail},function(er,rs){
-            if(rs){
-              res.send({"status":'0'}) //删除成功
-            }
-        })
-    })
-})
+app.get("/userRemove", function(req, res) {
+  let { e_mail } = req.query;
+  console.log(e_mail);
+  //删除注册表信息
+  MongoClient.connect(DBurl, function(err, db) {
+    db.collection("register").remove({ e_mail }, function(er, rs) {
+      if (rs) {
+        res.send({ status: "0" }); //删除成功
+      }
+    });
+  });
+  //删除登陆信息
+  MongoClient.connect(DBurl, function(err, db) {
+    db.collection("userServerData").remove({ e_mail }, function(er, rs) {
+      if (rs) {
+        res.send({ status: "0" }); //删除成功
+      }
+    });
+  });
+});
 
 // Promise检错提示
 process.on("unhandledRejection", (reason, p) => {
