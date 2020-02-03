@@ -6,10 +6,13 @@ let timeStamp = require("time-stamp"); // 时间
 var multiparty = require("multiparty"); //处理图片上传
 const crypto = require("crypto"); //加密
 const uuid = require("uuid/v1"); //uuid  随机生成图片名字
+const querystring = require("querystring"); //序列化与反序列化
 //设置后台加密内容
 const secret = "3123e;lkjfldsjfpsa[ofj";
 //引入path
 let path = require("path");
+let formidable = require("formidable");
+
 //后台生成秘钥
 const NodeRSA = require("node-rsa");
 const fs = require("fs");
@@ -64,8 +67,9 @@ function savePass(pwd) {
 
   return b_password;
 }
-
-// app.use("/upload", express.static("public/upload")); //存放图片的upload文件夹
+// app.use('/uploads', express.static("public/upload")) //存放图片的upload文件夹
+app.use("/uploads", express.static(__dirname + "/public/upload"));
+console.log(__dirname + "/public/upload");
 app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
@@ -255,56 +259,111 @@ app.post("/userPassAlter", function(req, res) {
 });
 //添加用户信息
 app.post("/userInfoAdd", function(req, res) {
- // let birthday = req.body.birthday.slice(0, 10);
-console.log(req.body.nickname)
-  let { username, nickname, sex, desc, hometown, job, fileList } = req.body;
+  //图片信息
+  let form = formidable.IncomingForm();
+  form.uploadDir = path.normalize(__dirname + "/public/tempDir");
+  form.parse(req, (err, fields, files) => {
+    //非图片信息,不需要存图片信息
+    let birthday = JSON.parse(fields.message).birthday.slice(0, 10);
+    let { src, username, nickname, sex, desc, hometown, job } = JSON.parse(
+      fields.message
+    );
 
-  //非图片信息
-  // MongoClient.connect(DBurl, function(err, db) {
-  //   db.collection("userInfo").findOne({ username }, function(er, rs) {
-  //     if (!rs) {
-  //       db.collection("userInfo").insertOne(
-  //         { username, nickname, desc, sex, hometown, job, birthday, fileList },
-  //         function(er, rs) {
-  //           if (rs) {
-  //             res.send("0"); //用户信息插入成功
-  //           }
-  //         }
-  //       );
-  //     } else {
-  //       db.collection("userInfo").findOneAndUpdate(
-  //         { username },
-  //         {
-  //           username,
-  //           nickname,
-  //           desc,
-  //           sex,
-  //           hometown,
-  //           job,
-  //           birthday,
-  //           fileList
-  //         },
-  //         function(er, rs) {
-  //           if (rs) {
-  //             res.send("1"); //用户信息更新成功
-  //           }
-  //         }
-  //       );
-  //     }
-  //   });
-  // });
+    console.log(JSON.parse(fields.message), 313123);
+    let upLoadFile = files.file;
+    //存在图片时
+    if (upLoadFile) {
+      let extname = path.extname(upLoadFile.name); //后缀名
+      let filename = uuid() + extname; //文件名
+      let oldPath = upLoadFile.path;
+      let newPath = path.join(__dirname, "public/upload", filename);
+      let url = `http://localhost:3001/uploads/${filename}`;
+      fs.rename(oldPath, newPath, err => {
+        if (!err) {
+          MongoClient.connect(DBurl, function(err, db) {
+            db.collection("userInfo").findOne({ username }, function(er, rs) {
+              if (!rs) {
+                db.collection("userInfo").insertOne(
+                  {
+                    url,
+                    username,
+                    nickname,
+                    desc,
+                    sex,
+                    hometown,
+                    job,
+                    birthday
+                  },
+                  function(er, rs) {
+                    if (rs) {
+                      res.send("0", file); //用户信息插入成功
+                    }
+                  }
+                );
+              } else {
+                db.collection("userInfo").findOneAndUpdate(
+                  { username },
+                  {
+                    url,
+                    username,
+                    nickname,
+                    desc,
+                    sex,
+                    hometown,
+                    job,
+                    birthday
+                  },
+                  function(er, rs) {
+                    if (rs) {
+                      res.send("1"); //用户信息更新成功
+                    }
+                  }
+                );
+              }
+            });
+          });
+
+          console.log("上传成功"); //上传成功
+        } else {
+          console.log("上传失败");
+        }
+      });
+    } else {
+      MongoClient.connect(DBurl, function(err, db) {
+        db.collection("userInfo").findOne({ username }, function(er, rs) {
+          if (!rs) {
+            db.collection("userInfo").insertOne(
+              { src, username, nickname, desc, sex, hometown, job, birthday },
+              function(er, rs) {
+                if (rs) {
+                  res.send("0"); //用户信息插入成功
+                }
+              }
+            );
+          } else {
+            db.collection("userInfo").findOneAndUpdate(
+              { username },
+              {
+                username,
+                nickname,
+                desc,
+                sex,
+                hometown,
+                job,
+                birthday
+              },
+              function(er, rs) {
+                if (rs) {
+                  res.send("1"); //用户信息更新成功
+                }
+              }
+            );
+          }
+        });
+      });
+    }
+  });
 });
-
-//头像信息
-// app.post("/userPicData",function(req,res){
-//   //图片信息
-//   // let form = formidable.IncomingForm()
-//   // form.uploadDir = path.normalize(__dirname + '/public/tempDir')
-//   // form.parse(req,(err,fields,files)=>{
-//   //   let uoLoadFile = files.file;
-//   // })
-//   console.log(req.body,222222)
-// })
 
 //获取用户信息
 app.get("/userInfoData", function(req, res) {
