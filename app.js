@@ -67,9 +67,8 @@ function savePass(pwd) {
 
   return b_password;
 }
-// app.use('/uploads', express.static("public/upload")) //存放图片的upload文件夹
 app.use("/uploads", express.static(__dirname + "/public/upload"));
-console.log(__dirname + "/public/upload");
+// console.log(__dirname + "/public/upload");
 app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
@@ -215,7 +214,6 @@ app.get("/getServerInfo", function(req, res) {
 //删除用户系统信息
 app.get("/deleteServerInfo", function(req, res) {
   let { _id } = req.query;
-  console.log(ObjectId(_id));
   MongoClient.connect(DBurl, function(err, db) {
     db.collection("userServerData").remove({
       _id: ObjectId(_id)
@@ -265,11 +263,9 @@ app.post("/userInfoAdd", function(req, res) {
   form.parse(req, (err, fields, files) => {
     //非图片信息,不需要存图片信息
     let birthday = JSON.parse(fields.message).birthday.slice(0, 10);
-    let { src, username, nickname, sex, desc, hometown, job } = JSON.parse(
+    let { url,e_mail, username, nickname, sex, desc, hometown, job } = JSON.parse(
       fields.message
     );
-
-    console.log(JSON.parse(fields.message), 313123);
     let upLoadFile = files.file;
     //存在图片时
     if (upLoadFile) {
@@ -277,7 +273,7 @@ app.post("/userInfoAdd", function(req, res) {
       let filename = uuid() + extname; //文件名
       let oldPath = upLoadFile.path;
       let newPath = path.join(__dirname, "public/upload", filename);
-      let url = `http://localhost:3001/uploads/${filename}`;
+      var uploadUrl = `http://localhost:3001/uploads/${filename}`;
       fs.rename(oldPath, newPath, err => {
         if (!err) {
           MongoClient.connect(DBurl, function(err, db) {
@@ -285,7 +281,8 @@ app.post("/userInfoAdd", function(req, res) {
               if (!rs) {
                 db.collection("userInfo").insertOne(
                   {
-                    url,
+                    uploadUrl,
+                    e_mail,
                     username,
                     nickname,
                     desc,
@@ -304,7 +301,8 @@ app.post("/userInfoAdd", function(req, res) {
                 db.collection("userInfo").findOneAndUpdate(
                   { username },
                   {
-                    url,
+                    uploadUrl,
+                    e_mail,
                     username,
                     nickname,
                     desc,
@@ -341,9 +339,12 @@ app.post("/userInfoAdd", function(req, res) {
               }
             );
           } else {
+            var uploadUrl = url 
             db.collection("userInfo").findOneAndUpdate(
               { username },
               {
+                uploadUrl,
+                e_mail,
                 username,
                 nickname,
                 desc,
@@ -380,7 +381,6 @@ app.get("/userInfoData", function(req, res) {
 //删除用户账号
 app.get("/userRemove", function(req, res) {
   let { e_mail } = req.query;
-  console.log(e_mail);
   //删除注册表信息
   MongoClient.connect(DBurl, function(err, db) {
     db.collection("register").remove({ e_mail }, function(er, rs) {
@@ -389,7 +389,7 @@ app.get("/userRemove", function(req, res) {
       }
     });
   });
-  //删除登陆信息
+  //删除登陆表信息
   MongoClient.connect(DBurl, function(err, db) {
     db.collection("userServerData").remove({ e_mail }, function(er, rs) {
       if (rs) {
@@ -397,7 +397,57 @@ app.get("/userRemove", function(req, res) {
       }
     });
   });
+  //删除信息表信息
+  MongoClient.connect(DBurl, function(err, db) {
+    db.collection("userInfo").remove({ e_mail }, function(er, rs) {
+      if (rs) {
+        res.send({ status: "0" }); //删除成功
+      }
+    });
+  });
 });
+
+//数据统计
+app.post("/optionStatistical",function(req,res){
+  console.log(req.body,'999999999999999999')
+  let {username} = req.body
+  MongoClient.connect(DBurl, function(err, db) {
+    db.collection("userStatistical").findOne({ username }, function(er, rs) {
+      if (!rs) {
+        db.collection("userStatistical").insertOne(req.body)
+      }
+      else {
+        console.log(username)
+        db.collection("userStatistical").findOneAndUpdate(
+          { username },
+          req.body,
+          function(er, rs) {
+            if (rs) {
+              res.send("1"); //用户信息更新成功
+            }
+            else{
+              console.log(er)
+            }
+          }
+        );
+      }
+    });
+  });
+})
+//获取统计数据
+app.get("/optionStatistical", function(req, res) {
+  let { username } = req.query;
+  MongoClient.connect(DBurl, function(err, db) {
+    db.collection("userStatistical")
+      .find({ username })
+      .toArray(function(err, result) {
+        if (result) {
+          res.send(result);
+        }
+      });
+  });
+});
+
 
 // Promise检错提示
 process.on("unhandledRejection", (reason, p) => {
