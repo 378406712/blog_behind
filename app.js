@@ -225,26 +225,10 @@ app.get("/deleteServerInfo", function(req, res) {
 //批量删除用户系统信息
 app.get("/deleteAllServerInfo", function(req, res) {
   let delData = JSON.parse(req.query._id);
-  console.log(delData, "1111");
-  // delData.map(item => {
-  //   MongoClient.connect(DBurl, function(err, db) {
-  //     db.collection("userServerData").remove(
-  //       {
-  //         _id: ObjectId(item)
-  //       },
-  //       function(er, rs) {
-  //         res.send({
-  //           status: "0" //删除成功
-  //         });
-  //       }
-  //     );
-  //   });
-  // });
   let newData = [];
   delData.map(item => {
     newData.push(ObjectId(item));
   });
-  console.log(newData);
   MongoClient.connect(DBurl, function(err, db) {
     db.collection("userServerData").deleteMany(
       {
@@ -255,9 +239,9 @@ app.get("/deleteAllServerInfo", function(req, res) {
       function(er, rs) {
         res.send({ status: "0" });
       }
-    )
-  })
-})
+    );
+  });
+});
 
 //修改用户账号密码
 app.post("/userPassAlter", function(req, res) {
@@ -425,31 +409,21 @@ app.get("/userInfoData", function(req, res) {
 });
 //删除用户账号
 app.get("/userRemove", function(req, res) {
-  let { e_mail } = req.query;
-  //删除注册表信息
+  let { e_mail, username } = req.query;
+  console.log(username);
+
   MongoClient.connect(DBurl, function(err, db) {
-    db.collection("register").remove({ e_mail }, function(er, rs) {
-      if (rs) {
-        res.send({ status: "0" }); //删除成功
-      }
-    });
+    //删除注册表信息
+    db.collection("register").remove({ e_mail });
+    //删除登陆表信息
+    db.collection("userServerData").remove({ e_mail });
+    //删除信息表信息
+    db.collection("userInfo").remove({ e_mail });
+    //删除统计表信息
+    db.collection("userStatistical").remove({ username:username });
   });
-  //删除登陆表信息
-  MongoClient.connect(DBurl, function(err, db) {
-    db.collection("userServerData").remove({ e_mail }, function(er, rs) {
-      if (rs) {
-        res.send({ status: "0" }); //删除成功
-      }
-    });
-  });
-  //删除信息表信息
-  MongoClient.connect(DBurl, function(err, db) {
-    db.collection("userInfo").remove({ e_mail }, function(er, rs) {
-      if (rs) {
-        res.send({ status: "0" }); //删除成功
-      }
-    });
-  });
+
+  res.send({ status: "0" }); //删除成功
 });
 
 //数据统计
@@ -461,7 +435,6 @@ app.post("/optionStatistical", function(req, res) {
       if (!rs) {
         db.collection("userStatistical").insertOne(req.body);
       } else {
-        console.log(username);
         db.collection("userStatistical").findOneAndUpdate(
           { username },
           req.body,
