@@ -18,8 +18,12 @@ const NodeRSA = require("node-rsa");
 const fs = require("fs");
 //生成公钥
 function generator() {
-  var key = new NodeRSA({ b: 512 });
-  key.setOptions({ encryptionScheme: "pkcs1" });
+  var key = new NodeRSA({
+    b: 512
+  });
+  key.setOptions({
+    encryptionScheme: "pkcs1"
+  });
 
   var privatePem = key.exportKey("pkcs1-private-pem");
   var publicPem = key.exportKey("pkcs8-public-pem");
@@ -39,7 +43,11 @@ app.get("/getPublicKey", (req, res) => {
   try {
     let publicKey = fs.readFileSync("./pem/public.pem", "utf-8");
     console.log("publicKey", publicKey);
-    res.send({ status: 0, msg: "公钥获取成功", resultmap: publicKey });
+    res.send({
+      status: 0,
+      msg: "公钥获取成功",
+      resultmap: publicKey
+    });
   } catch (err) {
     res.send(err);
   }
@@ -50,8 +58,7 @@ function savePass(pwd) {
   const privateKey = fs.readFileSync("./pem/private.pem", "utf8"); //读取私钥
   let buffer1 = Buffer.from(pwd, "base64"); //转化格式
   let password = crypto
-    .privateDecrypt(
-      {
+    .privateDecrypt({
         key: privateKey,
         padding: crypto.constants.RSA_PKCS1_PADDING // 注意这里的常量值要设置为RSA_PKCS1_PADDING
       },
@@ -83,43 +90,42 @@ let DBurl = "mongodb://127.0.0.1:27017/myBlog";
  * 重复：-1
  * 成功：0
  * 失败：1
- 
  */
 
 //用户注册
-app.post("/userRegister", function(req, res) {
-  let { username, password, e_mail } = req.body; //获取非加密用户名和邮箱
+app.post("/register", function (req, res) {
+  let {
+    username,
+    password,
+    e_mail
+  } = req.body; //获取非加密用户名和邮箱
 
-  MongoClient.connect(DBurl, function(err, db) {
-    db.collection("register").findOne(
-      {
+  MongoClient.connect(DBurl, function (err, db) {
+    db.collection("register").findOne({
         username
       },
-      function(er, rs) {
+      function (er, rs) {
         if (rs) {
           res.send("-1"); //用户名重复-1
         } else {
-          db.collection("register").findOne({ e_mail }, function(e, r) {
+          db.collection("register").findOne({
+            e_mail
+          }, function (e, r) {
             if (r) {
               //邮箱重复0
               res.send("0");
             } else {
               let b_password = savePass(password); //后端再加密端 密码 存入数据库
-
-              db.collection("register").insertOne(
-                {
+              db.collection("register").insertOne({
                   username,
                   b_password,
                   e_mail
                 },
-                function(e, r) {
+                function (e, r) {
                   if (r.insertedId) {
                     //插入成功1
                     console.log("插入成功1");
                     res.send("1");
-                  } else {
-                    console.log("插入失败2");
-                    res.send("2");
                   }
                 }
               );
@@ -132,17 +138,19 @@ app.post("/userRegister", function(req, res) {
 });
 
 //用户登录
-app.post("/userLogin", function(req, res) {
-  let { username, password } = req.body;
+app.post("/userLogin", function (req, res) {
+  let {
+    username,
+    password
+  } = req.body;
 
-  MongoClient.connect(DBurl, function(err, db) {
+  MongoClient.connect(DBurl, function (err, db) {
     let b_password = savePass(password);
 
-    db.collection("register").findOne(
-      {
+    db.collection("register").findOne({
         username
       },
-      function(er, rs) {
+      function (er, rs) {
         if (rs) {
           if (rs.b_password === b_password) {
             //密码正确,返回1
@@ -172,18 +180,24 @@ app.post("/userLogin", function(req, res) {
 });
 
 //传递用户系统信息(浏览器，操作系统信息)
-app.post("/postServerInfo", function(req, res) {
+app.post("/postServerInfo", function (req, res) {
   // console.log("headers = " + JSON.stringify(req.headers));// 包含了各种header，包括x-forwarded-for(如果被代理过的话)
   // console.log("x-forwarded-for = " + req.header('x-forwarded-for'));// 各阶段ip的CSV, 最左侧的是原始ip
   // console.log("ips = " + JSON.stringify(req.ips));// 相当于(req.header('x-forwarded-for') || '').split(',')
   // console.log("remoteAddress = " + req.connection.remoteAddress);// 未发生代理时，请求的ip
   // console.log("ip = " + req.ip);// 同req.connection.remoteAddress, 但是格式要好一些
 
-  let { username, e_mail, os, digits, browser } = req.body;
+  let {
+    username,
+    e_mail,
+    os,
+    digits,
+    browser
+  } = req.body;
   let ip = req.ip.slice(7);
   let time = timeStamp("YYYY-MM-DD HH:mm:ss");
 
-  MongoClient.connect(DBurl, function(err, db) {
+  MongoClient.connect(DBurl, function (err, db) {
     db.collection("userServerData").insertOne({
       username,
       e_mail,
@@ -198,13 +212,17 @@ app.post("/postServerInfo", function(req, res) {
 });
 
 //获取用户系统信息
-app.get("/getServerInfo", function(req, res) {
-  let { username } = req.query;
+app.get("/getServerInfo", function (req, res) {
+  let {
+    username
+  } = req.query;
   console.log(username);
-  MongoClient.connect(DBurl, function(err, db) {
+  MongoClient.connect(DBurl, function (err, db) {
     db.collection("userServerData")
-      .find({ username })
-      .toArray(function(err, result) {
+      .find({
+        username
+      })
+      .toArray(function (err, result) {
         if (result) {
           res.send(result);
         }
@@ -213,9 +231,11 @@ app.get("/getServerInfo", function(req, res) {
 });
 
 //删除用户系统信息
-app.get("/deleteServerInfo", function(req, res) {
-  let { _id } = req.query;
-  MongoClient.connect(DBurl, function(err, db) {
+app.get("/deleteServerInfo", function (req, res) {
+  let {
+    _id
+  } = req.query;
+  MongoClient.connect(DBurl, function (err, db) {
     db.collection("userServerData").remove({
       _id: ObjectId(_id)
     });
@@ -223,45 +243,58 @@ app.get("/deleteServerInfo", function(req, res) {
   res.send("删除成功");
 });
 //批量删除用户系统信息
-app.get("/deleteAllServerInfo", function(req, res) {
+app.get("/deleteAllServerInfo", function (req, res) {
   let delData = JSON.parse(req.query._id);
   let newData = [];
   delData.map(item => {
     newData.push(ObjectId(item));
   });
-  MongoClient.connect(DBurl, function(err, db) {
-    db.collection("userServerData").deleteMany(
-      {
+  MongoClient.connect(DBurl, function (err, db) {
+    db.collection("userServerData").deleteMany({
         _id: {
           $in: newData
         }
       },
-      function(er, rs) {
-        res.send({ status: "0" });
+      function (er, rs) {
+        res.send({
+          status: "0"
+        });
       }
     );
   });
 });
 
 //修改用户账号密码
-app.post("/userPassAlter", function(req, res) {
-  let { e_mail, originPass, againPass } = req.body;
+app.post("/userPassAlter", function (req, res) {
+  let {
+    e_mail,
+    originPass,
+    againPass
+  } = req.body;
 
   let b_password1 = savePass(originPass); //原密码
   let b_password2 = savePass(againPass); //修改的密码
 
-  MongoClient.connect(DBurl, function(err, db) {
-    db.collection("register").findOne({ e_mail }, function(er, rs) {
+  MongoClient.connect(DBurl, function (err, db) {
+    db.collection("register").findOne({
+      e_mail
+    }, function (er, rs) {
       if (rs) {
         if (rs.b_password == b_password1) {
           //update
-          db.collection("register").update(
-            { b_password: rs.b_password },
-            { $set: { b_password: b_password2 } },
+          db.collection("register").update({
+              b_password: rs.b_password
+            }, {
+              $set: {
+                b_password: b_password2
+              }
+            },
 
-            function(e, r) {
+            function (e, r) {
               if (!e) {
-                res.send({ status: "0" }); //修改成功
+                res.send({
+                  status: "0"
+                }); //修改成功
               }
             }
           );
@@ -271,13 +304,15 @@ app.post("/userPassAlter", function(req, res) {
           });
         }
       } else {
-        res.send({ status: "2" }); //网络问题
+        res.send({
+          status: "2"
+        }); //网络问题
       }
     });
   });
 });
 //添加用户信息
-app.post("/userInfoAdd", function(req, res) {
+app.post("/userInfoAdd", function (req, res) {
   //图片信息
   let form = formidable.IncomingForm();
   form.uploadDir = path.normalize(__dirname + "/public/tempDir");
@@ -305,11 +340,12 @@ app.post("/userInfoAdd", function(req, res) {
       var uploadUrl = `http://localhost:3001/uploads/${filename}`;
       fs.rename(oldPath, newPath, err => {
         if (!err) {
-          MongoClient.connect(DBurl, function(err, db) {
-            db.collection("userInfo").findOne({ username }, function(er, rs) {
+          MongoClient.connect(DBurl, function (err, db) {
+            db.collection("userInfo").findOne({
+              username
+            }, function (er, rs) {
               if (!rs) {
-                db.collection("userInfo").insertOne(
-                  {
+                db.collection("userInfo").insertOne({
                     uploadUrl,
                     e_mail,
                     username,
@@ -320,16 +356,16 @@ app.post("/userInfoAdd", function(req, res) {
                     job,
                     birthday
                   },
-                  function(er, rs) {
+                  function (er, rs) {
                     if (rs) {
                       res.send("0"); //用户信息插入成功
                     }
                   }
                 );
               } else {
-                db.collection("userInfo").findOneAndUpdate(
-                  { username },
-                  {
+                db.collection("userInfo").findOneAndUpdate({
+                    username
+                  }, {
                     uploadUrl,
                     e_mail,
                     username,
@@ -340,7 +376,7 @@ app.post("/userInfoAdd", function(req, res) {
                     job,
                     birthday
                   },
-                  function(er, rs) {
+                  function (er, rs) {
                     if (rs) {
                       res.send("1"); //用户信息更新成功
                     }
@@ -356,12 +392,22 @@ app.post("/userInfoAdd", function(req, res) {
         }
       });
     } else {
-      MongoClient.connect(DBurl, function(err, db) {
-        db.collection("userInfo").findOne({ username }, function(er, rs) {
+      MongoClient.connect(DBurl, function (err, db) {
+        db.collection("userInfo").findOne({
+          username
+        }, function (er, rs) {
           if (!rs) {
-            db.collection("userInfo").insertOne(
-              { src, username, nickname, desc, sex, hometown, job, birthday },
-              function(er, rs) {
+            db.collection("userInfo").insertOne({
+                src,
+                username,
+                nickname,
+                desc,
+                sex,
+                hometown,
+                job,
+                birthday
+              },
+              function (er, rs) {
                 if (rs) {
                   res.send("0"); //用户信息插入成功
                 }
@@ -369,9 +415,9 @@ app.post("/userInfoAdd", function(req, res) {
             );
           } else {
             var uploadUrl = url;
-            db.collection("userInfo").findOneAndUpdate(
-              { username },
-              {
+            db.collection("userInfo").findOneAndUpdate({
+                username
+              }, {
                 uploadUrl,
                 e_mail,
                 username,
@@ -382,7 +428,7 @@ app.post("/userInfoAdd", function(req, res) {
                 job,
                 birthday
               },
-              function(er, rs) {
+              function (er, rs) {
                 if (rs) {
                   res.send("1"); //用户信息更新成功
                 }
@@ -396,11 +442,15 @@ app.post("/userInfoAdd", function(req, res) {
 });
 
 //获取用户信息
-app.get("/userInfoData", function(req, res) {
-  let { username } = req.query;
+app.get("/userInfoData", function (req, res) {
+  let {
+    username
+  } = req.query;
 
-  MongoClient.connect(DBurl, function(err, db) {
-    db.collection("userInfo").findOne({ username }, function(er, rs) {
+  MongoClient.connect(DBurl, function (err, db) {
+    db.collection("userInfo").findOne({
+      username
+    }, function (er, rs) {
       if (rs) {
         res.send(rs);
       }
@@ -408,37 +458,55 @@ app.get("/userInfoData", function(req, res) {
   });
 });
 //删除用户账号
-app.get("/userRemove", function(req, res) {
-  let { e_mail, username } = req.query;
+app.get("/userRemove", function (req, res) {
+  let {
+    e_mail,
+    username
+  } = req.query;
   console.log(username);
 
-  MongoClient.connect(DBurl, function(err, db) {
+  MongoClient.connect(DBurl, function (err, db) {
     //删除注册表信息
-    db.collection("register").remove({ e_mail });
+    db.collection("register").remove({
+      e_mail
+    });
     //删除登陆表信息
-    db.collection("userServerData").remove({ e_mail });
+    db.collection("userServerData").remove({
+      e_mail
+    });
     //删除信息表信息
-    db.collection("userInfo").remove({ e_mail });
+    db.collection("userInfo").remove({
+      e_mail
+    });
     //删除统计表信息
-    db.collection("userStatistical").remove({ username:username });
+    db.collection("userStatistical").remove({
+      username: username
+    });
   });
 
-  res.send({ status: "0" }); //删除成功
+  res.send({
+    status: "0"
+  }); //删除成功
 });
 
 //数据统计
-app.post("/optionStatistical", function(req, res) {
+app.post("/optionStatistical", function (req, res) {
   console.log(req.body, "999999999999999999");
-  let { username } = req.body;
-  MongoClient.connect(DBurl, function(err, db) {
-    db.collection("userStatistical").findOne({ username }, function(er, rs) {
+  let {
+    username
+  } = req.body;
+  MongoClient.connect(DBurl, function (err, db) {
+    db.collection("userStatistical").findOne({
+      username
+    }, function (er, rs) {
       if (!rs) {
         db.collection("userStatistical").insertOne(req.body);
       } else {
-        db.collection("userStatistical").findOneAndUpdate(
-          { username },
+        db.collection("userStatistical").findOneAndUpdate({
+            username
+          },
           req.body,
-          function(er, rs) {
+          function (er, rs) {
             if (rs) {
               res.send("1"); //用户信息更新成功
             } else {
@@ -451,12 +519,16 @@ app.post("/optionStatistical", function(req, res) {
   });
 });
 //获取统计数据
-app.get("/optionStatistical", function(req, res) {
-  let { username } = req.query;
-  MongoClient.connect(DBurl, function(err, db) {
+app.get("/optionStatistical", function (req, res) {
+  let {
+    username
+  } = req.query;
+  MongoClient.connect(DBurl, function (err, db) {
     db.collection("userStatistical")
-      .find({ username })
-      .toArray(function(err, result) {
+      .find({
+        username
+      })
+      .toArray(function (err, result) {
         if (result) {
           res.send(result);
         }
