@@ -97,7 +97,7 @@ app.post("/register", function (req, res) {
   let {
     username,
     password,
-    e_mail
+    e_mail,token
   } = req.body; //获取非加密用户名和邮箱
 
   MongoClient.connect(DBurl, function (err, db) {
@@ -119,7 +119,7 @@ app.post("/register", function (req, res) {
               db.collection("register").insertOne({
                   username,
                   b_password,
-                  e_mail
+                  e_mail,token
                 },
                 function (e, r) {
                   if (r.insertedId) {
@@ -138,7 +138,7 @@ app.post("/register", function (req, res) {
 });
 
 //用户登录
-app.post("/userLogin", function (req, res) {
+app.post("/login/login", function (req, res) {
   let {
     username,
     password
@@ -463,7 +463,6 @@ app.get("/userRemove", function (req, res) {
     e_mail,
     username
   } = req.query;
-  console.log(username);
 
   MongoClient.connect(DBurl, function (err, db) {
     //删除注册表信息
