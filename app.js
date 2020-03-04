@@ -97,7 +97,10 @@ app.post("/register", function (req, res) {
   let {
     username,
     password,
-    e_mail,token
+    e_mail,
+    token,
+    avatar,
+    permission
   } = req.body; //获取非加密用户名和邮箱
 
   MongoClient.connect(DBurl, function (err, db) {
@@ -119,7 +122,10 @@ app.post("/register", function (req, res) {
               db.collection("register").insertOne({
                   username,
                   b_password,
-                  e_mail,token
+                  e_mail,
+                  token,
+                  avatar,
+                  permission
                 },
                 function (e, r) {
                   if (r.insertedId) {
@@ -144,9 +150,8 @@ app.post("/login/login", function (req, res) {
     password
   } = req.body;
 
+  let b_password = savePass(password);
   MongoClient.connect(DBurl, function (err, db) {
-    let b_password = savePass(password);
-
     db.collection("register").findOne({
         username
       },
@@ -156,40 +161,52 @@ app.post("/login/login", function (req, res) {
             //密码正确,返回1
             console.log(rs.b_password, 111111111111); //数据库中加密密码
             console.log(b_password, 22222222222); //前端传来的密码，解密后再加密 的密码
-
             res.send({
-              status: "1",
+              status: 1,
               e_mail: rs.e_mail,
-              username: rs.username
+              username: rs.username,
+              token: rs.token
             });
           } else {
-            //密码错误,返回2
+            //密码错误,返回-1
             res.send({
-              status: "2"
+              status: -1
             });
           }
         } else {
           //未查到该用户,返回0
           res.send({
-            status: "0"
+            status: 0
           });
         }
       }
     );
   });
 });
+//用户登陆信息
+app.post('/user/getInfo', function (req, res) {
+  let {
+    username
+  } = req.body
+  MongoClient.connect(DBurl, function (err, db) {
+    db.collection("register").findOne({
+        username
+      },
+      function (er, rs) {
+        res.send(rs);
+      }
+    );
+  });
+})
+//用户登出
+app.post('/login/logout', function (req, res) {
+  res.send('success')
+})
 
 //传递用户系统信息(浏览器，操作系统信息)
-app.post("/postServerInfo", function (req, res) {
-  // console.log("headers = " + JSON.stringify(req.headers));// 包含了各种header，包括x-forwarded-for(如果被代理过的话)
-  // console.log("x-forwarded-for = " + req.header('x-forwarded-for'));// 各阶段ip的CSV, 最左侧的是原始ip
-  // console.log("ips = " + JSON.stringify(req.ips));// 相当于(req.header('x-forwarded-for') || '').split(',')
-  // console.log("remoteAddress = " + req.connection.remoteAddress);// 未发生代理时，请求的ip
-  // console.log("ip = " + req.ip);// 同req.connection.remoteAddress, 但是格式要好一些
-
+app.post("/login/DeviceInfo", function (req, res) {
   let {
     username,
-    e_mail,
     os,
     digits,
     browser
@@ -200,7 +217,6 @@ app.post("/postServerInfo", function (req, res) {
   MongoClient.connect(DBurl, function (err, db) {
     db.collection("userServerData").insertOne({
       username,
-      e_mail,
       os,
       digits,
       browser,
@@ -208,15 +224,14 @@ app.post("/postServerInfo", function (req, res) {
       time
     });
   });
-  res.send("用户信息获取成功");
+
 });
 
 //获取用户系统信息
-app.get("/getServerInfo", function (req, res) {
+app.get("/homepage/getServerInfo", function (req, res) {
   let {
     username
   } = req.query;
-  console.log(username);
   MongoClient.connect(DBurl, function (err, db) {
     db.collection("userServerData")
       .find({
@@ -231,16 +246,19 @@ app.get("/getServerInfo", function (req, res) {
 });
 
 //删除用户系统信息
-app.get("/deleteServerInfo", function (req, res) {
+app.post("/homepage/deleteServerInfo", function (req, res) {
   let {
     _id
-  } = req.query;
+  } = req.body;
+  console.log(_id)
   MongoClient.connect(DBurl, function (err, db) {
     db.collection("userServerData").remove({
       _id: ObjectId(_id)
-    });
+    })
+    res.send('删除成功')
+
   });
-  res.send("删除成功");
+
 });
 //批量删除用户系统信息
 app.get("/deleteAllServerInfo", function (req, res) {
