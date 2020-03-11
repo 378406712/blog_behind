@@ -471,77 +471,31 @@ app.get('/userInfoData', function(req, res) {
   })
 })
 //删除用户账号
-app.get('/userRemove', function(req, res) {
-  let { e_mail, username } = req.query
-
+app.post('/user/userRemove', function(req, res) {
+  let { username } = req.body
+  console.log(username)
   MongoClient.connect(DBurl, function(err, db) {
     //删除注册表信息
-    db.collection('register').remove({
-      e_mail
-    })
-    //删除登陆表信息
-    db.collection('userServerData').remove({
-      e_mail
-    })
-    //删除信息表信息
-    db.collection('userInfo').remove({
-      e_mail
-    })
-    //删除统计表信息
-    db.collection('userStatistical').remove({
-      username: username
-    })
-  })
-
-  res.send({
-    status: '0'
-  }) //删除成功
-})
-
-//数据统计
-app.post('/optionStatistical', function(req, res) {
-  console.log(req.body, '999999999999999999')
-  let { username } = req.body
-  MongoClient.connect(DBurl, function(err, db) {
-    db.collection('userStatistical').findOne(
-      {
-        username
-      },
-      function(er, rs) {
-        if (!rs) {
-          db.collection('userStatistical').insertOne(req.body)
-        } else {
-          db.collection('userStatistical').findOneAndUpdate(
-            {
-              username
-            },
-            req.body,
-            function(er, rs) {
-              if (rs) {
-                res.send('1') //用户信息更新成功
-              } else {
-                console.log(er)
-              }
-            }
-          )
-        }
-      }
-    )
-  })
-})
-//获取统计数据
-app.get('/optionStatistical', function(req, res) {
-  let { username } = req.query
-  MongoClient.connect(DBurl, function(err, db) {
-    db.collection('userStatistical')
-      .find({
+    if (!err) {
+      db.collection('register').remove({
         username
       })
-      .toArray(function(err, result) {
-        if (result) {
-          res.send(result)
-        }
+      //删除登陆表信息
+      db.collection('userServerData').remove({
+        username
       })
+      //删除信息表信息
+      // db.collection('userInfo').remove({
+      //   e_mail
+      // })
+      res.send({
+        status: 'success'
+      }) //删除成功
+    } else {
+      res.send({
+        status: 'error'
+      }) //删除失败
+    }
   })
 })
 
