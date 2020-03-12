@@ -269,7 +269,7 @@ app.get('/deleteAllServerInfo', function(req, res) {
 
 //修改用户账号密码
 app.post('/user/passAlter', function(req, res) {
-  let { e_mail, originPass, newPass } = req.body
+  let { username, originPass, newPass } = req.body
 
   let b_password1 = savePass(originPass) //原密码
   let b_password2 = savePass(newPass) //修改的密码
@@ -277,7 +277,7 @@ app.post('/user/passAlter', function(req, res) {
   MongoClient.connect(DBurl, function(err, db) {
     db.collection('register').findOne(
       {
-        e_mail
+        username
       },
       function(er, rs) {
         if (rs) {
@@ -312,7 +312,7 @@ app.post('/user/passAlter', function(req, res) {
   })
 })
 //添加用户信息
-app.post('/userInfoAdd', function(req, res) {
+app.post('/user/userInfoAdd', function(req, res) {
   //图片信息
   let form = formidable.IncomingForm()
   form.uploadDir = path.normalize(__dirname + '/public/tempDir')
@@ -322,7 +322,6 @@ app.post('/userInfoAdd', function(req, res) {
     let {
       src,
       url,
-      e_mail,
       username,
       nickname,
       sex,
@@ -350,7 +349,6 @@ app.post('/userInfoAdd', function(req, res) {
                   db.collection('userInfo').insertOne(
                     {
                       uploadUrl,
-                      e_mail,
                       username,
                       nickname,
                       desc,
@@ -361,7 +359,7 @@ app.post('/userInfoAdd', function(req, res) {
                     },
                     function(er, rs) {
                       if (rs) {
-                        res.send('0') //用户信息插入成功
+                        res.send({ status: 'success-insert' }) //用户信息插入成功
                       }
                     }
                   )
@@ -372,7 +370,6 @@ app.post('/userInfoAdd', function(req, res) {
                     },
                     {
                       uploadUrl,
-                      e_mail,
                       username,
                       nickname,
                       desc,
@@ -383,7 +380,7 @@ app.post('/userInfoAdd', function(req, res) {
                     },
                     function(er, rs) {
                       if (rs) {
-                        res.send('1') //用户信息更新成功
+                        res.send({ status: 'success-update' }) //用户信息更新成功
                       }
                     }
                   )
@@ -418,7 +415,7 @@ app.post('/userInfoAdd', function(req, res) {
                 },
                 function(er, rs) {
                   if (rs) {
-                    res.send('0') //用户信息插入成功
+                    res.send({ status: 'success-insert' }) //用户信息插入成功
                   }
                 }
               )
@@ -430,7 +427,6 @@ app.post('/userInfoAdd', function(req, res) {
                 },
                 {
                   uploadUrl,
-                  e_mail,
                   username,
                   nickname,
                   desc,
@@ -441,7 +437,7 @@ app.post('/userInfoAdd', function(req, res) {
                 },
                 function(er, rs) {
                   if (rs) {
-                    res.send('1') //用户信息更新成功
+                    res.send({ status: 'success-update' }) //用户信息更新成功
                   }
                 }
               )
