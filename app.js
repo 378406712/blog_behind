@@ -50,7 +50,6 @@ app.get('/getPublicKey', (req, res) => {
     res.send(err)
   }
 })
-
 //后端解密--再加密
 function savePass(pwd) {
   const privateKey = fs.readFileSync('./pem/private.pem', 'utf8') //读取私钥
@@ -74,14 +73,12 @@ function savePass(pwd) {
   return b_password
 }
 app.use('/uploads', express.static(__dirname + '/public/upload'))
-// console.log(__dirname + "/public/upload");
 app.use(bodyParser.json())
 app.use(
   bodyParser.urlencoded({
     extended: false
   })
 )
-
 const MongoClient = require('mongodb') //数据库
 const ObjectId = require('mongodb').ObjectId
 const DBurl = 'mongodb://127.0.0.1:27017/myBlog'
@@ -184,7 +181,6 @@ app.post('/user/getInfo', function(req, res) {
 app.post('/login/logout', function(req, res) {
   res.send('SUCCESS')
 })
-
 //传递用户系统信息(浏览器，操作系统信息)
 app.post('/login/DeviceInfo', function(req, res) {
   const { username, os, digits, browser } = req.body
@@ -216,7 +212,6 @@ app.get('/homepage/getServerInfo', function(req, res) {
       })
   })
 })
-
 //删除用户系统信息(单条)
 app.post('/homepage/deleteServerInfo', function(req, res) {
   let { _id } = req.body
@@ -225,7 +220,7 @@ app.post('/homepage/deleteServerInfo', function(req, res) {
     db.collection('userServerData').remove({
       _id: ObjectId(_id)
     })
-    res.send({status:STATUS.SUCCESS})
+    res.send({ status: STATUS.SUCCESS })
   })
 })
 //批量删除用户系统信息
@@ -250,7 +245,6 @@ app.post('/homepage/BatchDeleteDevices', function(req, res) {
     )
   })
 })
-
 //修改用户账号密码
 app.post('/user/passAlter', function(req, res) {
   const { username, originPass, newPass } = req.body
@@ -278,7 +272,7 @@ app.post('/user/passAlter', function(req, res) {
               function(e, r) {
                 if (!e) {
                   res.send({
-                    status:STATUS.SUCCESS
+                    status: STATUS.SUCCESS
                   }) //修改成功
                 }
               }
@@ -300,10 +294,17 @@ app.post('/user/userInfoAdd', function(req, res) {
   form.uploadDir = path.normalize(__dirname + '/public/tempDir')
   form.parse(req, (err, fields, files) => {
     //非图片信息,不需要存图片信息
-    let birthday = JSON.parse(fields.message).birthday.slice(0, 10)
-    let { url, username, nickname, sex, desc, hometown, job } = JSON.parse(
-      fields.message
-    )
+    let {
+      url,
+      username,
+      nickname,
+      birthday,
+      sex,
+      desc,
+      hometown,
+      job
+    } = JSON.parse(fields.message)
+
     let upLoadFile = files.file
     //存在图片时
     if (upLoadFile) {
@@ -355,7 +356,7 @@ app.post('/user/userInfoAdd', function(req, res) {
                     },
                     function(er, rs) {
                       if (rs) {
-                        res.send({ status: STATUS.UPDATE}) //用户信息更新成功
+                        res.send({ status: STATUS.UPDATE }) //用户信息更新成功
                       }
                     }
                   )
@@ -421,7 +422,6 @@ app.post('/user/userInfoAdd', function(req, res) {
     }
   })
 })
-
 //获取用户信息
 app.get('/user/userInfoGet', function(req, res) {
   let { username } = req.query
