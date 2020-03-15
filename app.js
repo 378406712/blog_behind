@@ -233,7 +233,7 @@ app.get('/homepage/getServerInfo', function(req, res) {
   })
 })
 
-//删除用户系统信息
+//删除用户系统信息(单条)
 app.post('/homepage/deleteServerInfo', function(req, res) {
   let { _id } = req.body
   console.log(_id)
@@ -245,8 +245,8 @@ app.post('/homepage/deleteServerInfo', function(req, res) {
   })
 })
 //批量删除用户系统信息
-app.get('/deleteAllServerInfo', function(req, res) {
-  let delData = JSON.parse(req.query._id)
+app.post('/homepage/BatchDeleteDevices', function(req, res) {
+  let delData = JSON.parse(req.body._id)
   let newData = []
   delData.map(item => {
     newData.push(ObjectId(item))
@@ -319,16 +319,9 @@ app.post('/user/userInfoAdd', function(req, res) {
   form.parse(req, (err, fields, files) => {
     //非图片信息,不需要存图片信息
     let birthday = JSON.parse(fields.message).birthday.slice(0, 10)
-    let {
-      src,
-      url,
-      username,
-      nickname,
-      sex,
-      desc,
-      hometown,
-      job
-    } = JSON.parse(fields.message)
+    let { url, username, nickname, sex, desc, hometown, job } = JSON.parse(
+      fields.message
+    )
     let upLoadFile = files.file
     //存在图片时
     if (upLoadFile) {
@@ -336,7 +329,7 @@ app.post('/user/userInfoAdd', function(req, res) {
       let filename = uuid() + extname //文件名
       let oldPath = upLoadFile.path
       let newPath = path.join(__dirname, 'public/upload', filename)
-      var uploadUrl = `http://localhost:3001/uploads/${filename}`
+      let uploadUrl = `http://localhost:3001/uploads/${filename}`
       fs.rename(oldPath, newPath, err => {
         if (!err) {
           MongoClient.connect(DBurl, function(err, db) {
@@ -348,7 +341,7 @@ app.post('/user/userInfoAdd', function(req, res) {
                 if (!rs) {
                   db.collection('userInfo').insertOne(
                     {
-                      uploadUrl,
+                      url: uploadUrl,
                       username,
                       nickname,
                       desc,
@@ -369,7 +362,7 @@ app.post('/user/userInfoAdd', function(req, res) {
                       username
                     },
                     {
-                      uploadUrl,
+                      url: uploadUrl,
                       username,
                       nickname,
                       desc,
@@ -404,7 +397,6 @@ app.post('/user/userInfoAdd', function(req, res) {
             if (!rs) {
               db.collection('userInfo').insertOne(
                 {
-                  src,
                   username,
                   nickname,
                   desc,
@@ -420,13 +412,12 @@ app.post('/user/userInfoAdd', function(req, res) {
                 }
               )
             } else {
-              var uploadUrl = url
               db.collection('userInfo').findOneAndUpdate(
                 {
                   username
                 },
                 {
-                  uploadUrl,
+                  url,
                   username,
                   nickname,
                   desc,
@@ -450,7 +441,7 @@ app.post('/user/userInfoAdd', function(req, res) {
 })
 
 //获取用户信息
-app.get('/userInfoData', function(req, res) {
+app.get('/user/userInfoGet', function(req, res) {
   let { username } = req.query
 
   MongoClient.connect(DBurl, function(err, db) {
