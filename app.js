@@ -1,18 +1,16 @@
-let express = require('express') //引入express模块
-
-let app = express()
-let bodyParser = require('body-parser') //处理post
-let timeStamp = require('time-stamp') // 时间
-var multiparty = require('multiparty') //处理图片上传
+const STATUS = require('./const')
+const express = require('express') //引入express模块
+const app = express()
+const bodyParser = require('body-parser') //处理post
+const timeStamp = require('time-stamp') // 时间
+// var multiparty = require('multiparty') //处理图片上传
 const crypto = require('crypto') //加密
 const uuid = require('uuid/v1') //uuid  随机生成图片名字
-const querystring = require('querystring') //序列化与反序列化
 //设置后台加密内容
 const secret = '3123e;lkjfldsjfpsa[ofj'
 //引入path
-let path = require('path')
-let formidable = require('formidable')
-
+const path = require('path')
+const formidable = require('formidable')
 //后台生成秘钥
 const NodeRSA = require('node-rsa')
 const fs = require('fs')
@@ -84,18 +82,13 @@ app.use(
   })
 )
 
-let MongoClient = require('mongodb') //数据库
-let ObjectId = require('mongodb').ObjectId
-let DBurl = 'mongodb://127.0.0.1:27017/myBlog'
-/**
- * 重复：-1
- * 成功：0
- * 失败：1
- */
+const MongoClient = require('mongodb') //数据库
+const ObjectId = require('mongodb').ObjectId
+const DBurl = 'mongodb://127.0.0.1:27017/myBlog'
 
 //用户注册
 app.post('/register', function(req, res) {
-  let { username, password, e_mail, token, avatar, permission } = req.body //获取非加密用户名和邮箱
+  const { username, password, e_mail, token, avatar, permission } = req.body //获取非加密用户名和邮箱
 
   MongoClient.connect(DBurl, function(err, db) {
     db.collection('register').findOne(
@@ -104,7 +97,7 @@ app.post('/register', function(req, res) {
       },
       function(er, rs) {
         if (rs) {
-          res.send('-1') //用户名重复-1
+          res.send({ status: STATUS.USERNAME_REPERATED }) //用户名重复
         } else {
           db.collection('register').findOne(
             {
@@ -112,8 +105,7 @@ app.post('/register', function(req, res) {
             },
             function(e, r) {
               if (r) {
-                //邮箱重复0
-                res.send('0')
+                res.send({ status: STATUS.EMAIL_REPEATED }) //邮箱重复
               } else {
                 let b_password = savePass(password) //后端再加密端 密码 存入数据库
                 db.collection('register').insertOne(
@@ -127,9 +119,7 @@ app.post('/register', function(req, res) {
                   },
                   function(e, r) {
                     if (r.insertedId) {
-                      //插入成功1
-                      console.log('插入成功1')
-                      res.send('1')
+                      res.send({ status: STATUS.SUCCESS }) //注册成功
                     }
                   }
                 )
@@ -144,8 +134,7 @@ app.post('/register', function(req, res) {
 
 //用户登录
 app.post('/login/login', function(req, res) {
-  let { username, password } = req.body
-
+  const { username, password } = req.body
   let b_password = savePass(password)
   MongoClient.connect(DBurl, function(err, db) {
     db.collection('register').findOne(
@@ -155,25 +144,22 @@ app.post('/login/login', function(req, res) {
       function(er, rs) {
         if (rs) {
           if (rs.b_password === b_password) {
-            //密码正确,返回1
             console.log(rs.b_password, 111111111111) //数据库中加密密码
             console.log(b_password, 22222222222) //前端传来的密码，解密后再加密 的密码
             res.send({
-              status: 1,
+              status: STATUS.SUCCESS, //密码正确
               e_mail: rs.e_mail,
               username: rs.username,
               token: rs.token
             })
           } else {
-            //密码错误,返回-1
             res.send({
-              status: -1
+              status: STATUS.PASSWORD_ERROR //密码错误
             })
           }
         } else {
-          //未查到该用户,返回0
           res.send({
-            status: 0
+            status: STATUS.UNFIND //不存在该用户
           })
         }
       }
@@ -182,7 +168,7 @@ app.post('/login/login', function(req, res) {
 })
 //用户登陆信息
 app.post('/user/getInfo', function(req, res) {
-  let { username } = req.body
+  const { username } = req.body
   MongoClient.connect(DBurl, function(err, db) {
     db.collection('register').findOne(
       {
@@ -196,15 +182,14 @@ app.post('/user/getInfo', function(req, res) {
 })
 //用户登出
 app.post('/login/logout', function(req, res) {
-  res.send('success')
+  res.send('SUCCESS')
 })
 
 //传递用户系统信息(浏览器，操作系统信息)
 app.post('/login/DeviceInfo', function(req, res) {
-  let { username, os, digits, browser } = req.body
+  const { username, os, digits, browser } = req.body
   let ip = req.ip.slice(7)
   let time = timeStamp('YYYY-MM-DD HH:mm:ss')
-
   MongoClient.connect(DBurl, function(err, db) {
     db.collection('userServerData').insertOne({
       username,
@@ -216,10 +201,9 @@ app.post('/login/DeviceInfo', function(req, res) {
     })
   })
 })
-
 //获取用户系统信息
 app.get('/homepage/getServerInfo', function(req, res) {
-  let { username } = req.query
+  const { username } = req.query
   MongoClient.connect(DBurl, function(err, db) {
     db.collection('userServerData')
       .find({
@@ -241,7 +225,7 @@ app.post('/homepage/deleteServerInfo', function(req, res) {
     db.collection('userServerData').remove({
       _id: ObjectId(_id)
     })
-    res.send('删除成功')
+    res.send({status:STATUS.SUCCESS})
   })
 })
 //批量删除用户系统信息
@@ -260,7 +244,7 @@ app.post('/homepage/BatchDeleteDevices', function(req, res) {
       },
       function(er, rs) {
         res.send({
-          status: '0'
+          status: STATUS.SUCCESS
         })
       }
     )
@@ -269,11 +253,9 @@ app.post('/homepage/BatchDeleteDevices', function(req, res) {
 
 //修改用户账号密码
 app.post('/user/passAlter', function(req, res) {
-  let { username, originPass, newPass } = req.body
-
-  let b_password1 = savePass(originPass) //原密码
-  let b_password2 = savePass(newPass) //修改的密码
-
+  const { username, originPass, newPass } = req.body
+  const b_password1 = savePass(originPass) //原密码
+  const b_password2 = savePass(newPass) //修改的密码
   MongoClient.connect(DBurl, function(err, db) {
     db.collection('register').findOne(
       {
@@ -296,14 +278,14 @@ app.post('/user/passAlter', function(req, res) {
               function(e, r) {
                 if (!e) {
                   res.send({
-                    status: 'success'
+                    status:STATUS.SUCCESS
                   }) //修改成功
                 }
               }
             )
           } else {
             res.send({
-              status: 'error' //原密码错误
+              status: STATUS.PASSWORD_ERROR //原密码错误
             })
           }
         }
@@ -352,7 +334,7 @@ app.post('/user/userInfoAdd', function(req, res) {
                     },
                     function(er, rs) {
                       if (rs) {
-                        res.send({ status: 'success-insert' }) //用户信息插入成功
+                        res.send({ status: STATUS.SUCCESS }) //用户信息插入成功
                       }
                     }
                   )
@@ -373,7 +355,7 @@ app.post('/user/userInfoAdd', function(req, res) {
                     },
                     function(er, rs) {
                       if (rs) {
-                        res.send({ status: 'success-update' }) //用户信息更新成功
+                        res.send({ status: STATUS.UPDATE}) //用户信息更新成功
                       }
                     }
                   )
@@ -407,7 +389,7 @@ app.post('/user/userInfoAdd', function(req, res) {
                 },
                 function(er, rs) {
                   if (rs) {
-                    res.send({ status: 'success-insert' }) //用户信息插入成功
+                    res.send({ status: STATUS.SUCCESS }) //用户信息插入成功
                   }
                 }
               )
@@ -428,7 +410,7 @@ app.post('/user/userInfoAdd', function(req, res) {
                 },
                 function(er, rs) {
                   if (rs) {
-                    res.send({ status: 'success-update' }) //用户信息更新成功
+                    res.send({ status: STATUS.UPDATE }) //用户信息更新成功
                   }
                 }
               )
@@ -476,11 +458,11 @@ app.post('/user/userRemove', function(req, res) {
       //   e_mail
       // })
       res.send({
-        status: 'success'
+        status: STATUS.SUCCESS
       }) //删除成功
     } else {
       res.send({
-        status: 'error'
+        status: STATUS.ERROR
       }) //删除失败
     }
   })
