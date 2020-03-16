@@ -7,151 +7,16 @@
 // // var multiparty = require('multiparty') //处理图片上传
 // const crypto = require('crypto') //加密
 // const uuid = require('uuid/v1') //uuid  随机生成图片名字
-// //设置后台加密内容
-// const secret = '3123e;lkjfldsjfpsa[ofj'
-// //引入path
-// const path = require('path')
-// const formidable = require('formidable')
-// //后台生成秘钥
-// const NodeRSA = require('node-rsa')
-// const fs = require('fs')
-// //生成公钥
-// function generator() {
-//   var key = new NodeRSA({
-//     b: 512
-//   })
-//   key.setOptions({
-//     encryptionScheme: 'pkcs1'
-//   })
 
-//   var privatePem = key.exportKey('pkcs1-private-pem')
-//   var publicPem = key.exportKey('pkcs8-public-pem')
 
-//   fs.writeFile('./pem/public.pem', publicPem, err => {
-//     if (err) throw err
-//     console.log('公钥已保存！')
-//   })
-//   fs.writeFile('./pem/private.pem', privatePem, err => {
-//     if (err) throw err
-//     console.log('私钥已保存！')
-//   })
-// }
-// generator()
-// //获取公钥
-// app.get('/getPublicKey', (req, res) => {
-//   try {
-//     let publicKey = fs.readFileSync('./pem/public.pem', 'utf-8')
-//     console.log('publicKey', publicKey)
-//     res.send({
-//       status: 0,
-//       msg: '公钥获取成功',
-//       resultmap: publicKey
-//     })
-//   } catch (err) {
-//     res.send(err)
-//   }
-// })
-// //后端解密--再加密
-// function savePass(pwd) {
-//   const privateKey = fs.readFileSync('./pem/private.pem', 'utf8') //读取私钥
-//   let buffer1 = Buffer.from(pwd, 'base64') //转化格式
-//   let password = crypto
-//     .privateDecrypt(
-//       {
-//         key: privateKey,
-//         padding: crypto.constants.RSA_PKCS1_PADDING // 注意这里的常量值要设置为RSA_PKCS1_PADDING
-//       },
-//       buffer1
-//     )
-//     .toString('utf8')
-//   console.log('解密之后的密码', password)
-
-//   let b_password = crypto
-//     .createHmac('sha256', secret)
-//     .update(password)
-//     .digest('hex') //后端加密
-
-//   return b_password
-// }
-// app.use('/uploads', express.static(__dirname + '/public/upload'))
-// app.use(bodyParser.json())
-// app.use(
-//   bodyParser.urlencoded({
-//     extended: false
-//   })
-// )
 // const MongoClient = require('mongodb') //数据库
 // const ObjectId = require('mongodb').ObjectId
 // const DBurl = 'mongodb://127.0.0.1:27017/myBlog'
 
-// //用户登录
-// app.post('/login/login', function(req, res) {
-//   const { username, password } = req.body
-//   let b_password = savePass(password)
-//   MongoClient.connect(DBurl, function(err, db) {
-//     db.collection('register').findOne(
-//       {
-//         username
-//       },
-//       function(er, rs) {
-//         if (rs) {
-//           if (rs.b_password === b_password) {
-//             console.log(rs.b_password, 111111111111) //数据库中加密密码
-//             console.log(b_password, 22222222222) //前端传来的密码，解密后再加密 的密码
-//             res.send({
-//               status: STATUS.SUCCESS, //密码正确
-//               e_mail: rs.e_mail,
-//               username: rs.username,
-//               token: rs.token
-//             })
-//           } else {
-//             res.send({
-//               status: STATUS.PASSWORD_ERROR //密码错误
-//             })
-//           }
-//         } else {
-//           res.send({
-//             status: STATUS.UNFIND //不存在该用户
-//           })
-//         }
-//       }
-//     )
-//   })
-// })
-// //用户登陆信息
-// app.post('/user/getInfo', function(req, res) {
-//   const { username } = req.body
-//   MongoClient.connect(DBurl, function(err, db) {
-//     db.collection('register').findOne(
-//       {
-//         username
-//       },
-//       function(er, rs) {
-//         res.send(rs)
-//       }
-//     )
-//   })
-// })
-// //用户登出
-// app.post('/login/logout', function(req, res) {
-//   res.send('SUCCESS')
-// })
-// //传递用户系统信息(浏览器，操作系统信息)
-// app.post('/login/DeviceInfo', function(req, res) {
-//   const { username, os, digits, browser } = req.body
-//   let ip = req.ip.slice(7)
-//   let time = timeStamp('YYYY-MM-DD HH:mm:ss')
-//   MongoClient.connect(DBurl, function(err, db) {
-//     db.collection('userServerData').insertOne({
-//       username,
-//       os,
-//       digits,
-//       browser,
-//       ip,
-//       time
-//     })
-//   })
-// })
+
+
+
+
 // //获取用户系统信息
 // app.get('/homepage/getServerInfo', function(req, res) {
 //   const { username } = req.query

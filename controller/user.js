@@ -2,14 +2,14 @@ var express = require('express')
 const router = express.Router()
 const STATUS = require('../common/const')
 const User = require('../models/users') //引入model层
+const Device = require('../models/devices')
 const savePass = require('../common/save')
-
-// routes/index.js
+const timeStamp = require('time-stamp') // 时间
+const time = timeStamp('YYYY-MM-DD HH:mm:ss')
 
 //用户注册
 router.post('/register', function(req, res) {
   const { username, password, e_mail, token, avatar, permission } = req.body //获取非加密用户名和邮箱
-  console.log(req.body)
   let b_password = savePass(password) //后端再加密端 密码 存入数据库
   const postData = {
     username,
@@ -39,12 +39,13 @@ router.post('/register', function(req, res) {
   })
 })
 //用户登录
-
 router.post('/login', function(req, res) {
   const { username, password } = req.body
   let b_password = savePass(password)
   User.findOne({ username }, function(err, data) {
-    console.log(data.password === b_password)
+    if (!data) {
+      res.send({ status: STATUS.UNFIND })
+    }
     switch (data.password === b_password) {
       case true:
         res.send({
@@ -55,17 +56,28 @@ router.post('/login', function(req, res) {
         })
         break
       case false:
-        res.send({
-          status: STATUS.PASSWORD_ERROR
-        })
+        res.send({ status: STATUS.PASSWORD_ERROR })
         break
-      default:
-        res.send({
-          status: STATUS.UNFIND
-        })
     }
   })
-  
+})
+//用户登出
+router.post('/logout', function(req, res) {
+  res.send('SUCCESS')
+})
+//设备信息
+router.post('/DeviceInfo', function(req, res) {
+  const { username, os, digits, browser } = req.body
+  const ips = req.ip.slice(7)
+  const postData = { username, os, digits, browser, ip: ips }
+  Device.insertMany(postData)
+})
+// 获取用户登陆信息
+router.post('/getInfo', function(req, res) {
+  const { username } = req.body
+  User.findOne({ username }, function(err, data) {
+    res.send(data)
+  })
 })
 
 //暴露路由
