@@ -40,6 +40,33 @@ router.post('/register', function(req, res) {
 })
 //用户登录
 
+router.post('/login', function(req, res) {
+  const { username, password } = req.body
+  let b_password = savePass(password)
+  User.findOne({ username }, function(err, data) {
+    console.log(data.password === b_password)
+    switch (data.password === b_password) {
+      case true:
+        res.send({
+          status: STATUS.SUCCESS,
+          e_mail: data.e_mail,
+          username: data.username,
+          token: data.token
+        })
+        break
+      case false:
+        res.send({
+          status: STATUS.PASSWORD_ERROR
+        })
+        break
+      default:
+        res.send({
+          status: STATUS.UNFIND
+        })
+    }
+  })
+  
+})
 
 //暴露路由
 module.exports = router

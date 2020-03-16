@@ -6,7 +6,6 @@ const fs = require('fs')
 const generator = require('./common/generator') //加密
 const getPublicKey = require('./controller/publicKey')
 const user = require('./controller/user')
-const login = require('./controller/login')
 generator()
 //加载upload中图片资源
 app.use('/uploads', express.static(__dirname + '/public/upload'))
