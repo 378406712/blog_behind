@@ -15,56 +15,6 @@
 
 
 
-
-
-// //获取用户系统信息
-// app.get('/homepage/getServerInfo', function(req, res) {
-//   const { username } = req.query
-//   MongoClient.connect(DBurl, function(err, db) {
-//     db.collection('userServerData')
-//       .find({
-//         username
-//       })
-//       .toArray(function(err, result) {
-//         if (result) {
-//           res.send(result)
-//         }
-//       })
-//   })
-// })
-// //删除用户系统信息(单条)
-// app.post('/homepage/deleteServerInfo', function(req, res) {
-//   let { _id } = req.body
-//   console.log(_id)
-//   MongoClient.connect(DBurl, function(err, db) {
-//     db.collection('userServerData').remove({
-//       _id: ObjectId(_id)
-//     })
-//     res.send({ status: STATUS.SUCCESS })
-//   })
-// })
-// //批量删除用户系统信息
-// app.post('/homepage/BatchDeleteDevices', function(req, res) {
-//   let delData = JSON.parse(req.body._id)
-//   let newData = []
-//   delData.map(item => {
-//     newData.push(ObjectId(item))
-//   })
-//   MongoClient.connect(DBurl, function(err, db) {
-//     db.collection('userServerData').deleteMany(
-//       {
-//         _id: {
-//           $in: newData
-//         }
-//       },
-//       function(er, rs) {
-//         res.send({
-//           status: STATUS.SUCCESS
-//         })
-//       }
-//     )
-//   })
-// })
 // //修改用户账号密码
 // app.post('/user/passAlter', function(req, res) {
 //   const { username, originPass, newPass } = req.body

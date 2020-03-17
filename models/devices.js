@@ -7,6 +7,7 @@ var Schema = mongoose.Schema
 let deviceSchema = new Schema(
   {
     username: String,
+    ip: String,
     os: String,
     digits: String,
     browser: Object,

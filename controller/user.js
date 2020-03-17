@@ -1,11 +1,10 @@
-var express = require('express')
+const express = require('express')
 const router = express.Router()
 const STATUS = require('../common/const')
 const User = require('../models/users') //引入model层
 const Device = require('../models/devices')
-const savePass = require('../common/save')
 const timeStamp = require('time-stamp') // 时间
-const time = timeStamp('YYYY-MM-DD HH:mm:ss')
+const savePass = require('../common/save')
 
 //用户注册
 router.post('/register', function(req, res) {
@@ -65,11 +64,12 @@ router.post('/login', function(req, res) {
 router.post('/logout', function(req, res) {
   res.send('SUCCESS')
 })
-//设备信息
+//存入设备信息
 router.post('/DeviceInfo', function(req, res) {
+  const times = timeStamp('YYYY-MM-DD HH:mm:ss')
   const { username, os, digits, browser } = req.body
   const ips = req.ip.slice(7)
-  const postData = { username, os, digits, browser, ip: ips }
+  const postData = { username, os, digits, browser, ip: ips, time: times }
   Device.insertMany(postData)
 })
 // 获取用户登陆信息
