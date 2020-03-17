@@ -15,48 +15,7 @@
 
 
 
-// //修改用户账号密码
-// app.post('/user/passAlter', function(req, res) {
-//   const { username, originPass, newPass } = req.body
-//   const b_password1 = savePass(originPass) //原密码
-//   const b_password2 = savePass(newPass) //修改的密码
-//   MongoClient.connect(DBurl, function(err, db) {
-//     db.collection('register').findOne(
-//       {
-//         username
-//       },
-//       function(er, rs) {
-//         if (rs) {
-//           if (rs.b_password == b_password1) {
-//             //update
-//             db.collection('register').update(
-//               {
-//                 b_password: rs.b_password
-//               },
-//               {
-//                 $set: {
-//                   b_password: b_password2
-//                 }
-//               },
 
-//               function(e, r) {
-//                 if (!e) {
-//                   res.send({
-//                     status: STATUS.SUCCESS
-//                   }) //修改成功
-//                 }
-//               }
-//             )
-//           } else {
-//             res.send({
-//               status: STATUS.PASSWORD_ERROR //原密码错误
-//             })
-//           }
-//         }
-//       }
-//     )
-//   })
-// })
 // //添加用户信息
 // app.post('/user/userInfoAdd', function(req, res) {
 //   //图片信息

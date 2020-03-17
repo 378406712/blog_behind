@@ -79,6 +79,56 @@ router.post('/getInfo', function(req, res) {
     res.send(data)
   })
 })
+//修改用户密码
+router.post('/passAlter', function(req, res) {
+  const { username, originPass, newPass } = req.body
+  const b_password1 = savePass(originPass) //原密码
+  const b_password2 = savePass(newPass) //修改的密码
+  User.findOne({ username }, function(err, data) {
+    if (data.password === b_password1) {
+      User.findOneAndUpdate(data.password, {
+        $set: { password: b_password2 }
+      }).then(() => res.send({ status: STATUS.SUCCESS }))
+    }
+  })
+  // MongoClient.connect(DBurl, function(err, db) {
+  //   db.collection('register').findOne(
+  //     {
+  //       username
+  //     },
+  //     function(er, rs) {
+  //       if (rs) {
+  //         if (rs.b_password == b_password1) {
+  //           //update
+  //           db.collection('register').update(
+  //             {
+  //               b_password: rs.b_password
+  //             },
+  //             {
+  //               $set: {
+  //                 b_password: b_password2
+  //               }
+  //             },
+
+  //             function(e, r) {
+  //               if (
+  //                 !eres.send({
+  //                   status: STATUS.PASSWORD_ERROR //原密码错误
+  //                 })
+  //               ) {
+  //                 res.send({
+  //                   status: STATUS.SUCCESS
+  //                 }) //修改成功
+  //               }
+  //             }
+  //           )
+  //         } else {
+  //         }
+  //       }
+  //     }
+  //   )
+  // })
+})
 
 //暴露路由
 module.exports = router
