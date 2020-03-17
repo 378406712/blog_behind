@@ -1,10 +1,9 @@
 // Models/users.js
-
-var mongoose = require('mongoose')
-var Schema = mongoose.Schema
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
 // 声明一个数据集 对象
-let userSchema = new Schema(
+const userSchema = new Schema(
   {
     username: {
       type: String

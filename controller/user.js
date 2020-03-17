@@ -91,43 +91,43 @@ router.post('/passAlter', function(req, res) {
       }).then(() => res.send({ status: STATUS.SUCCESS }))
     }
   })
-  // MongoClient.connect(DBurl, function(err, db) {
-  //   db.collection('register').findOne(
-  //     {
-  //       username
-  //     },
-  //     function(er, rs) {
-  //       if (rs) {
-  //         if (rs.b_password == b_password1) {
-  //           //update
-  //           db.collection('register').update(
-  //             {
-  //               b_password: rs.b_password
-  //             },
-  //             {
-  //               $set: {
-  //                 b_password: b_password2
-  //               }
-  //             },
+})
+//删除用户账号
+router.post('/userRemove', function(req, res) {
+  const { username } = req.body
+  console.log(username)
+  User.deleteMany({ username }, async function() {
+    await Device.deleteMany({ username }, function() {})
+  })
+  
+  // Personal.deleteMany({username})
+  res.send({
+    status: STATUS.SUCCESS
+  }) //删除成功
 
-  //             function(e, r) {
-  //               if (
-  //                 !eres.send({
-  //                   status: STATUS.PASSWORD_ERROR //原密码错误
-  //                 })
-  //               ) {
-  //                 res.send({
-  //                   status: STATUS.SUCCESS
-  //                 }) //修改成功
-  //               }
-  //             }
-  //           )
-  //         } else {
-  //         }
-  //       }
+  //   MongoClient.connect(DBurl, function(err, db) {
+  //     //删除注册表信息
+  //     if (!err) {
+  //       db.collection('register').remove({
+  //         username
+  //       })
+  //       //删除登陆表信息
+  //       db.collection('userServerData').remove({
+  //         username
+  //       })
+  //       //删除信息表信息
+  //       // db.collection('userInfo').remove({
+  //       //   e_mail
+  //       // })
+  //       res.send({
+  //         status: STATUS.SUCCESS
+  //       }) //删除成功
+  //     } else {
+  //       res.send({
+  //         status: STATUS.ERROR
+  //       }) //删除失败
   //     }
-  //   )
-  // })
+  //   })
 })
 
 //暴露路由

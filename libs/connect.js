@@ -1,6 +1,7 @@
 // 引入数据库
 let mongoose = require('mongoose')
 mongoose.set('useCreateIndex', true) //加上这个
+mongoose.set('useFindAndModify', false)
 
 mongoose.connect('mongodb://localhost/myBlog', {
   useNewUrlParser: true,

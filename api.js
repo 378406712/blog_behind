@@ -5,6 +5,7 @@ const model = require('./libs/connect') //引入model层
 const generator = require('./common/generator') //加密
 const getPublicKey = require('./controller/publicKey')
 const user = require('./controller/user')
+const center = require('./controller/center')
 const homepage = require('./controller/homepage')
 generator()
 //加载upload中图片资源
@@ -18,6 +19,7 @@ app.use(
 app.use('/key',getPublicKey)
 app.use('/user', user)
 app.use('/homepage',homepage)
+app.use('/center',center)
 // Promise检错提示
 process.on('unhandledRejection', (reason, p) => {
   console.log('Unhandled Rejection at: Promise', p, 'reason:', reason)

@@ -1,10 +1,10 @@
 // Models/devices.js
 
-var mongoose = require('mongoose')
-var Schema = mongoose.Schema
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
 // 声明一个数据集 对象
-let deviceSchema = new Schema(
+const deviceSchema = new Schema(
   {
     username: String,
     ip: String,
