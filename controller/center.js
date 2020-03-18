@@ -35,7 +35,6 @@ router.post('/userInfoAdd', function(req, res) {
       nickname,
       birthday
     }
-
     if (upLoadFile) {
       //存在图片时
       let extname = path.extname(upLoadFile.name) //后缀名
@@ -84,26 +83,15 @@ router.post('/userInfoAdd', function(req, res) {
     }
   })
 })
-
-// //获取用户信息
-// app.get('/user/userInfoGet', function(req, res) {
-//   let { username } = req.query
-//   console.log('123')
-//   MongoClient.connect(DBurl, function(err, db) {
-//     db.collection('userInfo').findOne(
-//       {
-//         username
-//       },
-//       function(er, rs) {
-//         if (rs) {
-//           console.log('找到了')
-//           res.send(rs)
-//         }else{
-//           console.log('没找到')
-//         }
-//       }
-//     )
-//   })
-// })
+//获取用户信息
+router.get('/userInfoGet', function(req, res) {
+  const { username } = req.query
+  console.log(username)
+  Personal.findOne({ username }, function(err, data) {
+    if (!err) {
+      res.send(data)
+    }
+  })
+})
 
 module.exports = router
