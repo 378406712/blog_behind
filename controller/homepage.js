@@ -39,5 +39,4 @@ router.post('/BatchDeleteDevices', function(req, res) {
   )
 })
 
-
 module.exports = router

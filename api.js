@@ -5,21 +5,25 @@ const model = require('./libs/connect') //引入model层
 const generator = require('./common/generator') //加密
 const getPublicKey = require('./controller/publicKey')
 const user = require('./controller/user')
-const center = require('./controller/center')
+const account = require('./controller/account')
 const homepage = require('./controller/homepage')
+const edit = require('./controller/edit')
 generator()
 //加载upload中图片资源
 app.use('/uploads', express.static(__dirname + '/public/upload'))
+app.use('/uploadEditPic', express.static(__dirname + '/public/post-new'))
+
 app.use(bodyParser.json())
 app.use(
   bodyParser.urlencoded({
     extended: false
   })
 )
-app.use('/key',getPublicKey)
+app.use('/key', getPublicKey)
 app.use('/user', user)
-app.use('/homepage',homepage)
-app.use('/center',center)
+app.use('/homepage', homepage)
+app.use('/account', account)
+app.use('/edit', edit)
 // Promise检错提示
 process.on('unhandledRejection', (reason, p) => {
   console.log('Unhandled Rejection at: Promise', p, 'reason:', reason)

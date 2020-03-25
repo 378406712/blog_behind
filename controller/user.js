@@ -72,7 +72,7 @@ router.post('/DeviceInfo', function(req, res) {
   const postData = { username, os, digits, browser, ip: ips, time: times }
   Device.insertMany(postData)
 })
-// 获取用户登陆信息
+//获取用户登陆信息
 router.post('/getInfo', function(req, res) {
   const { username } = req.body
   User.findOne({ username }, function(err, data) {
@@ -95,39 +95,14 @@ router.post('/passAlter', function(req, res) {
 //删除用户账号
 router.post('/userRemove', function(req, res) {
   const { username } = req.body
-  console.log(username)
   User.deleteMany({ username }, async function() {
     await Device.deleteMany({ username }, function() {})
+    await Personal.deleteMany({ username }, function() {})
   })
-  
-  // Personal.deleteMany({username})
+
   res.send({
     status: STATUS.SUCCESS
-  }) //删除成功
-
-  //   MongoClient.connect(DBurl, function(err, db) {
-  //     //删除注册表信息
-  //     if (!err) {
-  //       db.collection('register').remove({
-  //         username
-  //       })
-  //       //删除登陆表信息
-  //       db.collection('userServerData').remove({
-  //         username
-  //       })
-  //       //删除信息表信息
-  //       // db.collection('userInfo').remove({
-  //       //   e_mail
-  //       // })
-  //       res.send({
-  //         status: STATUS.SUCCESS
-  //       }) //删除成功
-  //     } else {
-  //       res.send({
-  //         status: STATUS.ERROR
-  //       }) //删除失败
-  //     }
-  //   })
+  })
 })
 
 //暴露路由
