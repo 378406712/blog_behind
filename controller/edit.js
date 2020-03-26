@@ -1,12 +1,15 @@
 const express = require('express')
 const router = express()
 const EssayPic = require('../models/essay-pic')
+const Essay = require('../models/essay')
 const uuid = require('uuid/v1') //uuid  随机生成图片名字
+const STATUS = require('../common/const')
+
 const multiparty = require('multiparty') //处理图片上传
 const formidable = require('formidable')
 const fs = require('fs')
 const path = require('path')
-router.post('/post-new', function(req, res) {
+router.post('/essayPic', function(req, res) {
   const form = formidable.IncomingForm()
   form.parse(req, (err, fields, files) => {
     const upLoadFile = files.file
@@ -24,6 +27,17 @@ router.post('/post-new', function(req, res) {
         })
       }
     })
+  })
+})
+router.post('/post-new', function(req, res) {
+  console.log(req.body)
+  const { title, username, essay } = req.body
+  Essay.insertMany({ title, username, essay }, function(err, dos) {
+    if (!err) {
+      res.send({ status: STATUS.SUCCESS })
+    } else {
+      res.send({ status: STATUS.ERROR })
+    }
   })
 })
 module.exports = router

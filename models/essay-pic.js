@@ -3,8 +3,7 @@ const Schema = mongoose.Schema
 
 const PersonalSchema = new Schema(
   {
-    url: String,
-    username: String
+    file: String
   },
   {
     versionKey: false
