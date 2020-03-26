@@ -38,7 +38,6 @@ router.post('/userInfoAdd', function(req, res) {
     }
     if (upLoadFile) {
       //存在图片时
-
       let extname = path.extname(upLoadFile.name) //后缀名
       let filename = uuid() + extname //文件名
       const oldPath = upLoadFile.path

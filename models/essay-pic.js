@@ -10,4 +10,4 @@ const PersonalSchema = new Schema(
     versionKey: false
   }
 )
-module.exports = mongoose.model('newEssay', PersonalSchema)
+module.exports = mongoose.model('EssayPic', PersonalSchema)
