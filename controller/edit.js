@@ -31,13 +31,16 @@ router.post('/essayPic', function(req, res) {
 })
 router.post('/post-new', function(req, res) {
   console.log(req.body)
-  const { title, username, essay } = req.body
-  Essay.insertMany({ title, username, essay }, function(err, dos) {
-    if (!err) {
-      res.send({ status: STATUS.SUCCESS })
-    } else {
-      res.send({ status: STATUS.ERROR })
+  const { title, username, essay, essayStatus, essayPassword } = req.body
+  Essay.insertMany(
+    { title, username, essay, essayStatus, essayPassword },
+    function(err, dos) {
+      if (!err) {
+        res.send({ status: STATUS.SUCCESS })
+      } else {
+        res.send({ status: STATUS.ERROR })
+      }
     }
-  })
+  )
 })
 module.exports = router
