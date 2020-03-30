@@ -2,6 +2,7 @@ const express = require('express')
 const router = express()
 const EssayPic = require('../models/essay-pic')
 const Essay = require('../models/essay')
+const Category = require('../models/category')
 const uuid = require('uuid/v1') //uuid  随机生成图片名字
 const STATUS = require('../common/const')
 
@@ -31,16 +32,30 @@ router.post('/essayPic', function(req, res) {
 })
 router.post('/post-new', function(req, res) {
   console.log(req.body)
-  const { title, username, essay, essayStatus, essayPassword } = req.body
-  Essay.insertMany(
-    { title, username, essay, essayStatus, essayPassword },
-    function(err, dos) {
-      if (!err) {
-        res.send({ status: STATUS.SUCCESS })
-      } else {
-        res.send({ status: STATUS.ERROR })
-      }
+  const EssayData = {
+    title: req.body.title,
+    username: req.body.username,
+    essay: req.body.essay,
+    essayStatus: req.body.essayStatus,
+    essayPassword: req.body.essayPassword,
+    reCheck: req.body.reCheck,
+    keepTop: req.body.keepTop
+  }
+  Essay.insertMany(EssayData, function(err, dos) {
+    if (!err) {
+      res.send({ status: STATUS.SUCCESS })
+    } else {
+      res.send({ status: STATUS.ERROR })
     }
-  )
+  })
+})
+router.post('/set-category', function(req, res) {
+  const { username, category } = req.body
+  console.log(username + '----' + category)
+  Category.insertMany({ username, category }, function(err, dos) {
+    if (!err) {
+      res.send({ status: STATUS.SUCCESS })
+    }
+  })
 })
 module.exports = router

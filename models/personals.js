@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
-
+//个人信息
 const PersonalSchema = new Schema(
   {
     url:String,

@@ -2,7 +2,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-// 声明一个数据集 对象
+// 用户账号等
 const userSchema = new Schema(
   {
     username: {

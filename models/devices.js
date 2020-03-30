@@ -3,7 +3,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-// 声明一个数据集 对象
+// 设备信息
 const deviceSchema = new Schema(
   {
     username: String,
