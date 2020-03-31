@@ -58,4 +58,10 @@ router.post('/set-category', function(req, res) {
     }
   })
 })
+router.get('/get-category', function(req, res) {
+  const { username } = req.query
+  Category.find({ username }, function(err, docs) {
+    if (!err) res.send(docs)
+  })
+})
 module.exports = router
