@@ -35,6 +35,7 @@ router.post('/post-new', function(req, res) {
   const EssayData = {
     title: req.body.title,
     username: req.body.username,
+    category: req.body.category,
     essay: req.body.essay,
     essayStatus: req.body.essayStatus,
     essayPassword: req.body.essayPassword,
