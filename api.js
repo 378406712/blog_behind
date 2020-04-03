@@ -11,7 +11,7 @@ const edit = require('./controller/edit')
 generator()
 //加载upload中图片资源
 app.use('/uploads', express.static(__dirname + '/public/upload'))
-app.use('/uploadEditPic', express.static(__dirname + '/public/post-new'))
+app.use('/mediaSource', express.static(__dirname + '/public/media'))
 
 app.use(bodyParser.json())
 app.use(
