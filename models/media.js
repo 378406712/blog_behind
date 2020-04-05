@@ -3,7 +3,12 @@ const Schema = mongoose.Schema
 //媒体资源
 const MediaSchema = new Schema(
   {
-    file: String
+    file: String,
+    username: String,
+    size: String,
+    pic_width: Number,
+    pic_height: Number,
+    media_title: String
   },
   {
     versionKey: false

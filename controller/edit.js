@@ -13,19 +13,31 @@ const path = require('path')
 router.post('/media', function(req, res) {
   const form = formidable.IncomingForm()
   form.parse(req, (err, fields, files) => {
+    const { username, size, date, pic_width, pic_height, media_title } = fields
     const upLoadFile = files.file
-    let extname = path.extname(upLoadFile.name) //后缀名
-    let filename = uuid() + extname //文件名
+    const extname = path.extname(upLoadFile.name) //后缀名
+    const filename = uuid() + extname //文件名
     const oldPath = upLoadFile.path
     const newPath = path.join('./public/media', filename)
     const uploadUrl = `http://localhost:3001/mediaSource/${filename}`
     fs.rename(oldPath, newPath, err => {
       if (!err) {
-        Media.insertMany({ file: uploadUrl }, function(err, docs) {
-          if (!err) {
-            res.send({ file: uploadUrl })
+        Media.insertMany(
+          {
+            file: uploadUrl,
+            username,
+            size,
+            date,
+            pic_width,
+            pic_height,
+            media_title
+          },
+          function(err, docs) {
+            if (!err) {
+              res.send({ file: uploadUrl })
+            }
           }
-        })
+        )
       }
     })
   })
@@ -62,6 +74,12 @@ router.post('/set-category', function(req, res) {
 router.get('/get-category', function(req, res) {
   const { username } = req.query
   Category.find({ username }, function(err, docs) {
+    if (!err) res.send(docs)
+  })
+})
+router.get('/get-media', function(req, res) {
+  const { username } = req.query
+  Media.find({ username }, function(err, docs) {
     if (!err) res.send(docs)
   })
 })
