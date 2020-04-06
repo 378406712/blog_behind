@@ -13,7 +13,16 @@ const path = require('path')
 router.post('/media', function(req, res) {
   const form = formidable.IncomingForm()
   form.parse(req, (err, fields, files) => {
-    const { username, size, date, pic_width, pic_height, media_title } = fields
+    const {
+      file_name,
+      description,
+      username,
+      size,
+      date,
+      pic_width,
+      pic_height,
+      media_title
+    } = fields
     const upLoadFile = files.file
     const extname = path.extname(upLoadFile.name) //后缀名
     const filename = uuid() + extname //文件名
@@ -24,6 +33,8 @@ router.post('/media', function(req, res) {
       if (!err) {
         Media.insertMany(
           {
+            file_name,
+            description,
             file: uploadUrl,
             username,
             size,
@@ -34,7 +45,7 @@ router.post('/media', function(req, res) {
           },
           function(err, docs) {
             if (!err) {
-              res.send({ file: uploadUrl })
+              res.send(docs)
             }
           }
         )
@@ -43,7 +54,6 @@ router.post('/media', function(req, res) {
   })
 })
 router.post('/post-new', function(req, res) {
-  console.log(req.body)
   const EssayData = {
     title: req.body.title,
     username: req.body.username,
@@ -64,7 +74,6 @@ router.post('/post-new', function(req, res) {
 })
 router.post('/set-category', function(req, res) {
   const { username, category } = req.body
-  console.log(username + '----' + category)
   Category.insertMany({ username, category }, function(err, dos) {
     if (!err) {
       res.send({ status: STATUS.SUCCESS })
@@ -80,6 +89,12 @@ router.get('/get-category', function(req, res) {
 router.get('/get-media', function(req, res) {
   const { username } = req.query
   Media.find({ username }, function(err, docs) {
+    if (!err) res.send(docs)
+  })
+})
+router.get('/media-detail', function(req, res) {
+  const { username, _id } = req.query
+  Media.findOne({ username, _id }, function(err, docs) {
     if (!err) res.send(docs)
   })
 })

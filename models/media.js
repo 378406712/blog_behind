@@ -8,7 +8,9 @@ const MediaSchema = new Schema(
     size: String,
     pic_width: Number,
     pic_height: Number,
-    media_title: String
+    media_title: String,
+    file_name: String,
+    description: String
   },
   {
     versionKey: false
