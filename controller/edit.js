@@ -5,7 +5,7 @@ const Essay = require('../models/essay')
 const Category = require('../models/category')
 const uuid = require('uuid/v1') //uuid  随机生成图片名字
 const STATUS = require('../common/const')
-
+const ObjectId = require('mongodb').ObjectId
 const multiparty = require('multiparty') //处理图片上传
 const formidable = require('formidable')
 const fs = require('fs')
@@ -80,6 +80,48 @@ router.post('/set-category', function(req, res) {
     }
   })
 })
+router.post('/change-media', function(req, res) {
+  const { id, identify } = req.body
+  console.log(req.body)
+  if (identify === 'description') {
+    Media.findByIdAndUpdate(
+      { _id: ObjectId(id) },
+      {
+        $set: {
+          description: req.body.description
+        }
+      },
+      {
+        new: true
+      },
+      function(err, docs) {
+        if (!err) {
+          console.log(docs)
+          res.send(docs)
+        }
+      }
+    )
+  } else if (identify === 'file_name') {
+    Media.findByIdAndUpdate(
+      { _id: ObjectId(id) },
+      {
+        $set: {
+          file_name: req.body.file_name
+        }
+      },
+      {
+        new: true
+      },
+      function(err, docs) {
+        if (!err) {
+          console.log(docs)
+          res.send(docs)
+        }
+      }
+    )
+  }
+})
+
 router.get('/get-category', function(req, res) {
   const { username } = req.query
   Category.find({ username }, function(err, docs) {
