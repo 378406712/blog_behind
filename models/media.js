@@ -10,7 +10,9 @@ const MediaSchema = new Schema(
     pic_height: Number,
     media_title: String,
     file_name: String,
-    description: String
+    description: String,
+    date: String,
+    selectDate: String
   },
   {
     versionKey: false

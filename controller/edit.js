@@ -21,7 +21,8 @@ router.post('/media', function(req, res) {
       date,
       pic_width,
       pic_height,
-      media_title
+      media_title,
+      selectDate
     } = fields
     const upLoadFile = files.file
     const extname = path.extname(upLoadFile.name) //后缀名
@@ -41,7 +42,8 @@ router.post('/media', function(req, res) {
             date,
             pic_width,
             pic_height,
-            media_title
+            media_title,
+            selectDate
           },
           function(err, docs) {
             if (!err) {
@@ -82,7 +84,6 @@ router.post('/set-category', function(req, res) {
 })
 router.post('/change-media', function(req, res) {
   const { id, identify } = req.body
-  console.log(req.body)
   if (identify === 'description') {
     Media.findByIdAndUpdate(
       { _id: ObjectId(id) },
@@ -96,7 +97,6 @@ router.post('/change-media', function(req, res) {
       },
       function(err, docs) {
         if (!err) {
-          console.log(docs)
           res.send(docs)
         }
       }
@@ -114,7 +114,6 @@ router.post('/change-media', function(req, res) {
       },
       function(err, docs) {
         if (!err) {
-          console.log(docs)
           res.send(docs)
         }
       }
@@ -129,14 +128,27 @@ router.get('/get-category', function(req, res) {
   })
 })
 router.get('/get-media', function(req, res) {
-  const { username } = req.query
-  Media.find({ username }, function(err, docs) {
-    if (!err) res.send(docs)
-  })
+  const { username, date } = req.query
+  console.log(username, date)
+  if (date === '全部日期') {
+    Media.find({ username }, function(err, docs) {
+      if (!err) res.send(docs)
+    })
+  } else {
+    Media.find({ username, selectDate: date }, function(err, docs) {
+      if (!err) res.send(docs)
+    })
+  }
 })
 router.get('/media-detail', function(req, res) {
   const { username, _id } = req.query
   Media.findOne({ username, _id }, function(err, docs) {
+    if (!err) res.send(docs)
+  })
+})
+router.get('/media-date', function(req, res) {
+  const { username } = req.query
+  Media.find({ username }, function(err, docs) {
     if (!err) res.send(docs)
   })
 })
