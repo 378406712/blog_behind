@@ -120,6 +120,16 @@ router.post('/change-media', function(req, res) {
     )
   }
 })
+router.post('/media-remove', function(req, res) {
+  const { username, _id } = req.body
+  Media.findOneAndDelete({ username, _id }, function(err) {
+    if (!err) {
+      res.send({ status: STATUS.SUCCESS })
+    } else {
+      res.send({ status: STATUS.ERROR })
+    }
+  })
+})
 
 router.get('/get-category', function(req, res) {
   const { username } = req.query
@@ -159,8 +169,11 @@ router.get('/media-search', function(req, res) {
       { media_title: { $regex: keywords, $options: '$i' } }
     ]
   }
-  Media.where({username}).where(_filter).exec(function(err,docs){
-    res.send(docs)
-  })
+  Media.where({ username })
+    .where(_filter)
+    .exec(function(err, docs) {
+      res.send(docs)
+    })
 })
+
 module.exports = router
