@@ -129,7 +129,6 @@ router.get('/get-category', function(req, res) {
 })
 router.get('/get-media', function(req, res) {
   const { username, date } = req.query
-  console.log(username, date)
   if (date === '全部日期') {
     Media.find({ username }, function(err, docs) {
       if (!err) res.send(docs)
@@ -150,6 +149,18 @@ router.get('/media-date', function(req, res) {
   const { username } = req.query
   Media.find({ username }, function(err, docs) {
     if (!err) res.send(docs)
+  })
+})
+router.get('/media-search', function(req, res) {
+  const { username, keywords } = req.query
+  const _filter = {
+    $or: [
+      { file_name: { $regex: keywords, $options: '$i' } },
+      { media_title: { $regex: keywords, $options: '$i' } }
+    ]
+  }
+  Media.where({username}).where(_filter).exec(function(err,docs){
+    res.send(docs)
   })
 })
 module.exports = router
