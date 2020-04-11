@@ -8,15 +8,11 @@ const savePass = require('../common/save')
 
 //用户注册
 router.post('/register', function(req, res) {
-  const { username, password, e_mail, token, avatar, permission } = req.body //获取非加密用户名和邮箱
+  const { username, password, e_mail } = req.body //获取非加密用户名和邮箱
   let b_password = savePass(password) //后端再加密端 密码 存入数据库
   const postData = {
-    username,
-    password: b_password,
-    e_mail,
-    token,
-    avatar,
-    permission
+    ...req.body,
+    password: b_password
   }
   User.findOne({ username }, function(err, data) {
     if (data) {
@@ -28,7 +24,7 @@ router.post('/register', function(req, res) {
         } //邮箱重复
         else {
           // 保存到数据库
-          User.create(postData, function(err, data) {
+          User.create(postData, function(err) {
             if (err) throw err
             res.send({ status: STATUS.SUCCESS }) //注册成功
           })
@@ -67,9 +63,8 @@ router.post('/logout', function(req, res) {
 //存入设备信息
 router.post('/DeviceInfo', function(req, res) {
   const times = timeStamp('YYYY-MM-DD HH:mm:ss')
-  const { username, os, digits, browser } = req.body
   const ips = req.ip.slice(7)
-  const postData = { username, os, digits, browser, ip: ips, time: times }
+  const postData = { ...req.body, ip: ips, time: times }
   Device.insertMany(postData)
 })
 //获取用户登陆信息
@@ -99,11 +94,9 @@ router.post('/userRemove', function(req, res) {
     await Device.deleteMany({ username }, function() {})
     await Personal.deleteMany({ username }, function() {})
   })
-
   res.send({
     status: STATUS.SUCCESS
   })
 })
-
 //暴露路由
 module.exports = router

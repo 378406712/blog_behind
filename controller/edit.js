@@ -13,17 +13,6 @@ const path = require('path')
 router.post('/media', function(req, res) {
   const form = formidable.IncomingForm()
   form.parse(req, (err, fields, files) => {
-    const {
-      file_name,
-      description,
-      username,
-      size,
-      date,
-      pic_width,
-      pic_height,
-      media_title,
-      selectDate
-    } = fields
     const upLoadFile = files.file
     const extname = path.extname(upLoadFile.name) //后缀名
     const filename = uuid() + extname //文件名
@@ -32,41 +21,17 @@ router.post('/media', function(req, res) {
     const uploadUrl = `http://localhost:3001/mediaSource/${filename}`
     fs.rename(oldPath, newPath, err => {
       if (!err) {
-        Media.insertMany(
-          {
-            file_name,
-            description,
-            file: uploadUrl,
-            username,
-            size,
-            date,
-            pic_width,
-            pic_height,
-            media_title,
-            selectDate
-          },
-          function(err, docs) {
-            if (!err) {
-              res.send(docs)
-            }
+        Media.insertMany({ ...fields, file: uploadUrl }, function(err, docs) {
+          if (!err) {
+            res.send(docs)
           }
-        )
+        })
       }
     })
   })
 })
 router.post('/post-new', function(req, res) {
-  const EssayData = {
-    title: req.body.title,
-    username: req.body.username,
-    category: req.body.category,
-    essay: req.body.essay,
-    essayStatus: req.body.essayStatus,
-    essayPassword: req.body.essayPassword,
-    reCheck: req.body.reCheck,
-    keepTop: req.body.keepTop
-  }
-  Essay.insertMany(EssayData, function(err, dos) {
+  Essay.insertMany(req.body, function(err, dos) {
     if (!err) {
       res.send({ status: STATUS.SUCCESS })
     } else {
@@ -75,8 +40,7 @@ router.post('/post-new', function(req, res) {
   })
 })
 router.post('/set-category', function(req, res) {
-  const { username, category } = req.body
-  Category.insertMany({ username, category }, function(err, dos) {
+  Category.insertMany(req.body, function(err, dos) {
     if (!err) {
       res.send({ status: STATUS.SUCCESS })
     }
@@ -121,8 +85,7 @@ router.post('/change-media', function(req, res) {
   }
 })
 router.post('/media-remove', function(req, res) {
-  const { username, _id } = req.body
-  Media.findOneAndDelete({ username, _id }, function(err) {
+  Media.findOneAndDelete(req.body, function(err) {
     if (!err) {
       res.send({ status: STATUS.SUCCESS })
     } else {
@@ -130,10 +93,8 @@ router.post('/media-remove', function(req, res) {
     }
   })
 })
-
 router.get('/get-category', function(req, res) {
-  const { username } = req.query
-  Category.find({ username }, function(err, docs) {
+  Category.find(req.query, function(err, docs) {
     if (!err) res.send(docs)
   })
 })
@@ -150,14 +111,12 @@ router.get('/get-media', function(req, res) {
   }
 })
 router.get('/media-detail', function(req, res) {
-  const { username, _id } = req.query
-  Media.findOne({ username, _id }, function(err, docs) {
+  Media.findOne(req.query, function(err, docs) {
     if (!err) res.send(docs)
   })
 })
 router.get('/media-date', function(req, res) {
-  const { username } = req.query
-  Media.find({ username }, function(err, docs) {
+  Media.find(req.query, function(err, docs) {
     if (!err) res.send(docs)
   })
 })

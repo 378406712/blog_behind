@@ -16,26 +16,8 @@ router.post('/userInfoAdd', function(req, res) {
   form.parse(req, (err, fields, files) => {
     //非图片信息,不需要存图片信息
     const upLoadFile = files.file
-    let {
-      url,
-      job,
-      sex,
-      desc,
-      username,
-      nickname,
-      birthday,
-      hometown
-    } = JSON.parse(fields.message)
-    const postData1 = {
-      url,
-      job,
-      sex,
-      desc,
-      hometown,
-      username,
-      nickname,
-      birthday
-    }
+    const { username } = JSON.parse(fields.message)
+    const postData1 = JSON.parse(fields.message)
     if (upLoadFile) {
       //存在图片时
       let extname = path.extname(upLoadFile.name) //后缀名
@@ -44,16 +26,9 @@ router.post('/userInfoAdd', function(req, res) {
       const newPath = path.join('./public/upload', filename)
       const uploadUrl = `http://localhost:3001/uploads/${filename}`
       const postData2 = {
-        url: uploadUrl,
-        job,
-        sex,
-        desc,
-        username,
-        nickname,
-        birthday,
-        hometown
+        ...postData1,
+        url: uploadUrl
       }
-
       fs.rename(oldPath, newPath, err => {
         if (!err) {
           User.findOneAndUpdate(

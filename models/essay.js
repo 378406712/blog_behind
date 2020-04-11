@@ -5,7 +5,8 @@ const Essay = new Schema(
   {
     essay: String,
     title: String,
-    category: Array,
+    special_bg: String,
+    checkCategory: Array,
     essayStatus: String,
     essayPassword: String,
     username: String,
