@@ -134,5 +134,17 @@ router.get('/media-search', function(req, res) {
       res.send(docs)
     })
 })
+router.get('/category-search', function(req, res) {
+  const { username, keywords } = req.query
+  const _filter = {
+    $or: [{ category: { $regex: keywords, $options: '$i' } }]
+  }
+  Category.where({ username })
+    .where(_filter)
+    .exec(function(err, docs) {
+      console.log(docs)
+      res.send(docs)
+    })
+})
 
 module.exports = router
