@@ -1,15 +1,15 @@
 const express = require('express')
 const router = express()
+const fs = require('fs')
+const path = require('path')
 const Media = require('../models/media')
 const Essay = require('../models/essay')
 const Category = require('../models/category')
-const uuid = require('uuid/v1') //uuid  随机生成图片名字
-const STATUS = require('../common/const')
 const ObjectId = require('mongodb').ObjectId
+const uuid = require('uuid/v1') //uuid  随机生成图片名字
 const multiparty = require('multiparty') //处理图片上传
 const formidable = require('formidable')
-const fs = require('fs')
-const path = require('path')
+const STATUS = require('../common/const')
 router.post('/media', function(req, res) {
   const form = formidable.IncomingForm()
   form.parse(req, (err, fields, files) => {
@@ -31,7 +31,7 @@ router.post('/media', function(req, res) {
   })
 })
 router.post('/post-new', function(req, res) {
-  Essay.insertMany(req.body, function(err, dos) {
+  Essay.insertMany(req.body, function(err, docs) {
     if (!err) {
       res.send({ status: STATUS.SUCCESS })
     } else {
@@ -39,10 +39,45 @@ router.post('/post-new', function(req, res) {
     }
   })
 })
+router.post('/category-count', async function(req, res) {
+  const { username, checkCategory } = req.body
+  new Promise(resolve => {
+    checkCategory.map(item => {
+      Essay.countDocuments({ username, checkCategory: item }, function(
+        err,
+        count
+      ) {
+        if (!err) {
+          Category.updateMany(
+            { username, category: item },
+            {
+              $set: {
+                sum: count
+              }
+            },
+            function() {
+              resolve()
+            }
+          )
+        }
+      })
+    })
+  }).then(() => {
+    Category.find({ username }, function(err, docs) {
+      if (!err) res.send(docs)
+    })
+  })
+})
+
 router.post('/set-category', function(req, res) {
-  Category.insertMany(req.body, function(err, dos) {
-    if (!err) {
-      res.send({ status: STATUS.SUCCESS })
+  const { username, category } = req.body
+  Category.findOne({ username, category }, function(err, docs) {
+    if (docs) {
+      res.send({ ...docs, check: true })
+    } else if (!err && !docs) {
+      Category.insertMany(req.body, function(err, docs) {
+        res.send({ ...docs, check: true })
+      })
     }
   })
 })
@@ -142,7 +177,6 @@ router.get('/category-search', function(req, res) {
   Category.where({ username })
     .where(_filter)
     .exec(function(err, docs) {
-      console.log(docs)
       res.send(docs)
     })
 })

@@ -7,7 +7,11 @@ const Schema = mongoose.Schema
 const categorySchema = new Schema(
   {
     username: String,
-    category: String
+    category: String,
+    alias: String,
+    desc: String,
+    pic: String,
+    sum:Number
   },
   {
     versionKey: false
