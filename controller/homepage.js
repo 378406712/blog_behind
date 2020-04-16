@@ -16,7 +16,7 @@ router.get('/getDevices', function(req, res) {
 // 删除用户系统信息(单条)
 router.post('/deleteDevice', function(req, res) {
   let { _id } = req.body
-  Devices.remove({ _id: ObjectId(_id) }, function(err) {
+  Devices.deleteOne({ _id: ObjectId(_id) }, function(err) {
     if (!err) return res.send({ status: STATUS.SUCCESS })
   })
 })

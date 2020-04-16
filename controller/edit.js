@@ -10,6 +10,7 @@ const uuid = require('uuid/v1') //uuid  随机生成图片名字
 const multiparty = require('multiparty') //处理图片上传
 const formidable = require('formidable')
 const STATUS = require('../common/const')
+// 提交富文本中图片
 router.post('/media', function(req, res) {
   const form = formidable.IncomingForm()
   form.parse(req, (err, fields, files) => {
@@ -30,6 +31,7 @@ router.post('/media', function(req, res) {
     })
   })
 })
+// 提交新文章
 router.post('/post-new', function(req, res) {
   Essay.insertMany(req.body, function(err, docs) {
     if (!err) {
@@ -39,7 +41,8 @@ router.post('/post-new', function(req, res) {
     }
   })
 })
-router.post('/category-count', async function(req, res) {
+// 目录下文章统计
+router.post('/category-count', function(req, res) {
   const { username, checkCategory } = req.body
   new Promise(resolve => {
     checkCategory.map(item => {
@@ -68,11 +71,11 @@ router.post('/category-count', async function(req, res) {
     })
   })
 })
-
+// 新增目录
 router.post('/set-category', function(req, res) {
   const { username, category } = req.body
   Category.findOne({ username, category }, function(err, docs) {
-    if (docs) {
+    if (docs && category.category != '未分类') {
       res.send({ ...docs, check: true })
     } else if (!err && !docs) {
       Category.insertMany(req.body, function(err, docs) {
@@ -81,6 +84,7 @@ router.post('/set-category', function(req, res) {
     }
   })
 })
+// 更改媒体信息
 router.post('/change-media', function(req, res) {
   const { id, identify } = req.body
   if (identify === 'description') {
@@ -119,6 +123,7 @@ router.post('/change-media', function(req, res) {
     )
   }
 })
+// 删除媒体文件
 router.post('/media-remove', function(req, res) {
   Media.findOneAndDelete(req.body, function(err) {
     if (!err) {
@@ -128,14 +133,16 @@ router.post('/media-remove', function(req, res) {
     }
   })
 })
+// 获取目录
 router.get('/get-category', function(req, res) {
   Category.find(req.query, function(err, docs) {
     if (!err) res.send(docs)
   })
 })
+// 获取媒体文件
 router.get('/get-media', function(req, res) {
   const { username, date } = req.query
-  if (date === '全部日期') {
+  if (date === 'all') {
     Media.find({ username }, function(err, docs) {
       if (!err) res.send(docs)
     })
@@ -145,16 +152,19 @@ router.get('/get-media', function(req, res) {
     })
   }
 })
+// 获取媒体信息
 router.get('/media-detail', function(req, res) {
   Media.findOne(req.query, function(err, docs) {
     if (!err) res.send(docs)
   })
 })
+// 获取媒体信息中的日期
 router.get('/media-date', function(req, res) {
   Media.find(req.query, function(err, docs) {
     if (!err) res.send(docs)
   })
 })
+// 获取筛选的媒体
 router.get('/media-search', function(req, res) {
   const { username, keywords } = req.query
   const _filter = {
@@ -169,6 +179,7 @@ router.get('/media-search', function(req, res) {
       res.send(docs)
     })
 })
+// 获取筛选的目录
 router.get('/category-search', function(req, res) {
   const { username, keywords } = req.query
   const _filter = {

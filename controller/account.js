@@ -1,13 +1,14 @@
 const express = require('express')
 const router = express()
-const uuid = require('uuid/v1') //uuid  随机生成图片名字
-const multiparty = require('multiparty') //处理图片上传
-const STATUS = require('../common/const')
-const formidable = require('formidable')
 const fs = require('fs')
 const path = require('path')
+const formidable = require('formidable')
+const STATUS = require('../common/const')
+const uuid = require('uuid/v1') //uuid  随机生成图片名字
+const multiparty = require('multiparty') //处理图片上传
 const Personal = require('../models/personals')
 const User = require('../models/users')
+
 //添加用户信息
 router.post('/userInfoAdd', function(req, res) {
   //图片信息
