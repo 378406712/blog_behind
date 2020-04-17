@@ -10,6 +10,7 @@ router.get('/get-essay', function(req, res) {
     res.send(docs)
   })
 })
+// 批量删除目录
 router.post('/BatchDeleteCategory', function(req, res) {
   const _id = JSON.parse(req.body._id)
   let newData = []
@@ -30,9 +31,9 @@ router.post('/BatchDeleteCategory', function(req, res) {
           const before = req.body.category
           const after = item.checkCategory
           let diff = arrayDiffer(after, before)
-          console.log(item.checkCategory) //目录下的文章
+          //  console.log(item.checkCategory) //目录下的文章
           //arrayDiffer数组diff拿到文章中目录与点击删除目录不同部分
-          if (item.checkCategory.length === 1 && !diff.length) {
+          if (!diff.length) {
             //只存在一个目录下，肯定无差异，直接改为'未分类'
             Essay.findByIdAndUpdate(
               { _id: Object(item._id) },
@@ -46,26 +47,13 @@ router.post('/BatchDeleteCategory', function(req, res) {
                 if (!err) resolve()
               }
             )
-          } else if (item.checkCategory.length > 1 && diff.length) {
+          } else if (diff.length) {
             //存在多个目录下,且有差异，删除所有目录
             Essay.findByIdAndUpdate(
               { _id: Object(item._id) },
               {
                 $set: {
                   checkCategory: diff //将原目录替换为差异目录，即删去了点击选择的目录(该文章在多个目录下情况)
-                }
-              },
-              function(err, docs) {
-                resolve()
-              }
-            )
-          } else if (item.checkCategory.length > 1 && !diff.length) {
-            //存在多个目录下,删除所有目录
-            Essay.findByIdAndUpdate(
-              { _id: Object(item._id) },
-              {
-                $set: {
-                  checkCategory: '未分类'
                 }
               },
               function(err, docs) {

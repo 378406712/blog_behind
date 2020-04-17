@@ -41,7 +41,7 @@ router.post('/post-new', function(req, res) {
     }
   })
 })
-// 目录下文章统计
+// 目录下文章统计(单条)
 router.post('/category-count', function(req, res) {
   const { username, checkCategory } = req.body
   new Promise(resolve => {
@@ -71,6 +71,47 @@ router.post('/category-count', function(req, res) {
     })
   })
 })
+// 目录下文章统计(全部)
+router.post('/category-count-all', function(req, res) {
+  const { username } = req.body
+  console.log(req.body)
+  Category.where(username).then(data => {
+    new Promise(resolve => {
+      let dataArr = []
+      data.map(item => {
+        dataArr.push(item.category)
+      })
+      new Promise(resolve => {
+        dataArr.map(item => {
+          Essay.countDocuments({ username, checkCategory: item }, function(
+            err,
+            count
+          ) {
+            if (!err) {
+              Category.updateMany(
+                { username, category: item },
+                {
+                  $set: {
+                    sum: count
+                  }
+                },
+                function() {
+                  resolve()
+                }
+              )
+            }
+          })
+        })
+      }).then(() => {
+        Category.find({ username }, function(err, docs) {
+          if (!err) res.send(docs)
+        })
+      })
+    })
+  
+  })
+})
+
 // 新增目录
 router.post('/set-category', function(req, res) {
   const { username, category } = req.body
