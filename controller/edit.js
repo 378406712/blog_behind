@@ -74,7 +74,6 @@ router.post('/category-count', function(req, res) {
 // 目录下文章统计(全部)
 router.post('/category-count-all', function(req, res) {
   const { username } = req.body
-  console.log(req.body)
   Category.where(username).then(data => {
     new Promise(resolve => {
       let dataArr = []
@@ -108,19 +107,17 @@ router.post('/category-count-all', function(req, res) {
         })
       })
     })
-  
   })
 })
-
 // 新增目录
 router.post('/set-category', function(req, res) {
   const { username, category } = req.body
   Category.findOne({ username, category }, function(err, docs) {
     if (docs && category.category != '未分类') {
-      res.send({ ...docs, check: true })
+      res.send(docs)
     } else if (!err && !docs) {
       Category.insertMany(req.body, function(err, docs) {
-        res.send({ ...docs, check: true })
+        res.send(docs[0])
       })
     }
   })
