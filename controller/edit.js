@@ -50,7 +50,6 @@ router.post('/category-count', function(req, res) {
         err,
         count
       ) {
-        console.log(count,'count2')
         if (!err) {
           Category.updateMany(
             { username, category: item },
@@ -87,7 +86,6 @@ router.post('/category-count-all', function(req, res) {
             err,
             count
           ) {
-            console.log(count,'count1')
             if (!err) {
               Category.updateMany(
                 { username, category: item },

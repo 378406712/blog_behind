@@ -26,7 +26,6 @@ router.post('/BatchDeleteCategory', function(req, res) {
       .where('checkCategory')
       .in(req.body.category)
       .then(data => {
-        console.log(data)
         // console.log(data) 获取到该目录下的文章，遍历
         if (data.length === 0) return resolve()
         else {
@@ -68,7 +67,6 @@ router.post('/BatchDeleteCategory', function(req, res) {
         }
       })
   }).then(() => {
-    console.log(123)
     Category.deleteMany(
       {
         _id: {
@@ -82,6 +80,15 @@ router.post('/BatchDeleteCategory', function(req, res) {
       }
     )
   })
+})
+// 获取详细目录信息
+router.get('/get-categoryDetail', function(req, res) {
+  let { _id } = req.query
+  if (_id ) {
+    Category.findById({ _id: ObjectId(_id) }, function(err, docs) {
+      res.send(docs)
+    })
+  }
 })
 
 module.exports = router
