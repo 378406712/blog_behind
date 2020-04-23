@@ -4,7 +4,6 @@ const Category = require('../models/category')
 const Essay = require('../models/essay')
 const ObjectId = require('mongodb').ObjectId
 const arrayDiffer = require('array-differ')
-const _ = require('loadsh')
 router.get('/get-essay', function(req, res) {
   Essay.find(req.query, function(err, docs) {
     res.send(docs)
@@ -106,31 +105,30 @@ router.post('/alter-category', function(req, res) {
             let index = item.checkCategory.indexOf(...docs.category)
             if (index > -1) {
               item.checkCategory.splice(index, 1, category)
-              // Essay.updateMany(
-              //   { username, checkCategory: docs.category },
-              //   {
-              //     $set: {
-              //       checkCategory: item.checkCategory
-              //     }
-              //   },
-              //   function(err) {}
-              // )
+              Essay.updateOne(
+                { username, checkCategory: docs.category },
+                {
+                  $set: {
+                    checkCategory: item.checkCategory
+                  }
+                },
+                function(err) {}
+              )
               console.log(docs.category)
             }
-            
           })
         }
       })
-      // .then(() => {
-      //   Category.findByIdAndUpdate(
-      //     { _id: ObjectId(_id) },
-      //     req.body,
-      //     { new: true },
-      //     function(err, docs) {
-      //       return res.send(docs)
-      //     }
-      //   )
-      // })
+      .then(() => {
+        Category.findByIdAndUpdate(
+          { _id: ObjectId(_id) },
+          req.body,
+          { new: true },
+          function(err, docs) {
+            return res.send(docs)
+          }
+        )
+      })
   })
 })
 module.exports = router

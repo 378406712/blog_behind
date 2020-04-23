@@ -15,7 +15,6 @@
     "express": "^4.17.1",
     "formidable": "^1.2.1",
     "imageinfo": "^1.0.4",
-    "loadsh": "0.0.4",
     "mongoose": "^5.9.4",
     "multiparty": "^4.2.1",
     "node-rsa": "^1.0.7",
