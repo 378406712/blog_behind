@@ -38,6 +38,7 @@
 
 ## 目录结构
 
+```
 models
 ├─category.js
 ├─devices.js
@@ -45,7 +46,11 @@ models
 ├─media.js
 ├─personals.js
 └users.js
+```
 
+
+
+```
 controller
 ├─account.js
 ├─category.js
@@ -53,13 +58,16 @@ controller
 ├─homepage.js
 ├─publicKey.js
 └user.js
+```
+
+
 
 ## Api接口
 
 | account.js   |              |
 | ------------ | :----------: |
-| /userInfoAdd | 添加用户信息 |
-| /userInfoGet | 获取用户信息 |
+| /userInfoAdd | 添加用户信息  |
+| /userInfoGet | 获取用户信息  |
 
 | **category.js**      |                  |
 | -------------------- | ---------------- |
