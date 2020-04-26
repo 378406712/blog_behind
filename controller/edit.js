@@ -220,6 +220,7 @@ router.get('/media-search', function(req, res) {
 // 获取筛选的目录
 router.get('/category-search', function(req, res) {
   const { username, keywords } = req.query
+  console.log(username, keywords)
   const _filter = {
     $or: [{ category: { $regex: keywords, $options: '$i' } }]
   }

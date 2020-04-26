@@ -105,6 +105,7 @@ router.post('/alter-category', function(req, res) {
             let index = item.checkCategory.indexOf(...docs.category)
             if (index > -1) {
               item.checkCategory.splice(index, 1, category)
+              console.log(item)
               Essay.updateOne(
                 { username, checkCategory: docs.category },
                 {
@@ -112,9 +113,10 @@ router.post('/alter-category', function(req, res) {
                     checkCategory: item.checkCategory
                   }
                 },
-                function(err) {}
+                function(err) {
+                  console.log(err)
+                }
               )
-              console.log(docs.category)
             }
           })
         }
