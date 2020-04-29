@@ -12,7 +12,8 @@ const Essay = new Schema(
     username: String,
     password: String,
     reCheck: Boolean,
-    keepTop: Boolean
+    keepTop: Boolean,
+    date: String
   },
   {
     versionKey: false
