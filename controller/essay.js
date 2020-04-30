@@ -11,7 +11,7 @@ router.get('/get-essay', function(req, res) {
     if (!err) res.send(docs)
   })
 })
-// 获取筛选的文章
+// 获取搜索的文章
 router.get('/essay-search', function(req, res) {
   const { username, keywords } = req.query
   const _filter = {
@@ -25,6 +25,36 @@ router.get('/essay-search', function(req, res) {
     .exec(function(err, docs) {
       res.send(docs)
     })
+})
+// 获取筛选的文章
+router.get('/essay-filter', function(req, res) {
+  const { username, checkCategory, date } = req.query
+  if (checkCategory === 'all-category' && date === 'all-date') {
+    Essay.where({ username }).exec(function(err, docs) {
+      res.send(docs)
+    })
+  } else if (checkCategory === 'all-category' || date === 'all-date') {
+    const _filter = {
+      $or: [
+        { checkCategory: { $regex: checkCategory, $options: '$i' } },
+        { selectDate: { $regex: date, $options: '$i' } }
+      ]
+    }
+    Essay.where({ username })
+      .where(_filter)
+      .exec(function(err, docs) {
+        res.send(docs)
+      })
+  } else {
+    const _filter = {
+      $or: [{ checkCategory: { $regex: checkCategory, $options: '$i' } }]
+    }
+    Essay.where({ username, selectDate: date })
+      .where(_filter)
+      .exec(function(err, docs) {
+        res.send(docs)
+      })
+  }
 })
 // 批量删除文章
 router.post('/BatchDeleteEssay', function(req, res) {
