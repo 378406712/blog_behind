@@ -82,10 +82,10 @@ router.post('/BatchDeleteCategory', function(req, res) {
 })
 // 获取详细目录信息
 router.get('/get-categoryDetail', function(req, res) {
-  let { _id } = req.query
-  if (_id) {
-    Category.findById({ _id: ObjectId(_id) }, function(err, docs) {
-      res.send(docs)
+  let { category } = req.query
+  if (category) {
+    Category.find({ category }, function(err, docs) {
+      res.send(...docs)
     })
   }
 })
