@@ -5,72 +5,91 @@ const ObjectId = require('mongodb').ObjectId
 const STATUS = require('../common/const')
 
 // 获取所有文章
-router.get('/get-essay', function(req, res) {
-  const { keywords, username } = req.query
-  Essay.find({ username }, function(err, docs) {
+router.get('/get-essay', function (req, res) {
+  const { username, keyword } = req.query
+  console.log(keyword)
+  let keywords = {}
+  switch (keyword) {
+    case 'all':
+      keywords = { username }
+      break
+    case 'trash':
+      keywords = { username, trash: true }
+      break
+    case 'draft':
+      keywords = { username, draft: true }
+      break
+    case 'sended':
+      keywords = { username, reCheck: false, draft: false, trash: false }
+      break
+    case 'pend':
+      keywords = { username, reCheck: true }
+      break
+  }
+  Essay.find(keywords, function (err, docs) {
     if (!err) res.send(docs)
   })
 })
 // 获取搜索的文章
-router.get('/essay-search', function(req, res) {
+router.get('/essay-search', function (req, res) {
   const { username, keywords } = req.query
   const _filter = {
     $or: [
       { title: { $regex: keywords, $options: '$i' } },
-      { date: { $regex: keywords, $options: '$i' } }
-    ]
+      { date: { $regex: keywords, $options: '$i' } },
+    ],
   }
   Essay.where({ username })
     .where(_filter)
-    .exec(function(err, docs) {
+    .exec(function (err, docs) {
       res.send(docs)
     })
 })
 // 获取筛选的文章
-router.get('/essay-filter', function(req, res) {
+router.get('/essay-filter', function (req, res) {
   const { username, checkCategory, date } = req.query
   if (checkCategory === 'all-category' && date === 'all-date') {
-    Essay.where({ username }).exec(function(err, docs) {
+    Essay.where({ username }).exec(function (err, docs) {
       res.send(docs)
     })
   } else if (checkCategory === 'all-category' || date === 'all-date') {
     const _filter = {
       $or: [
         { checkCategory: { $regex: checkCategory, $options: '$i' } },
-        { selectDate: { $regex: date, $options: '$i' } }
-      ]
+        { selectDate: { $regex: date, $options: '$i' } },
+      ],
     }
     Essay.where({ username })
       .where(_filter)
-      .exec(function(err, docs) {
+      .exec(function (err, docs) {
         res.send(docs)
       })
   } else {
     const _filter = {
-      $or: [{ checkCategory: { $regex: checkCategory, $options: '$i' } }]
+      $or: [{ checkCategory: { $regex: checkCategory, $options: '$i' } }],
     }
     Essay.where({ username, selectDate: date })
       .where(_filter)
-      .exec(function(err, docs) {
+      .exec(function (err, docs) {
         res.send(docs)
       })
   }
 })
 // 批量删除文章
-router.post('/BatchDeleteEssay', function(req, res) {
+router.post('/BatchDeleteEssay', function (req, res) {
   const _id = JSON.parse(req.body._id)
   let newData = []
-  _id.map(item => {
+  _id.map((item) => {
     newData.push(ObjectId(item))
   })
 
   Essay.deleteMany(
     {
       _id: {
-        $in: newData
-      }
+        $in: newData,
+      },
     },
-    function(err, docs) {
+    function (err, docs) {
       if (!err) {
         res.send({ status: STATUS.SUCCESS })
       }
@@ -78,8 +97,8 @@ router.post('/BatchDeleteEssay', function(req, res) {
   )
 })
 // 获取文章信息中的日期
-router.get('/essay-date', function(req, res) {
-  Essay.find(req.query, function(err, docs) {
+router.get('/essay-date', function (req, res) {
+  Essay.find(req.query, function (err, docs) {
     if (!err) res.send(docs)
   })
 })
