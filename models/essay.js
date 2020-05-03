@@ -13,11 +13,13 @@ const Essay = new Schema(
     password: String,
     reCheck: Boolean,
     keepTop: Boolean,
+    draft: Boolean,
+    trash: Boolean,
     date: String,
-    selectDate: String
+    selectDate: String,
   },
   {
-    versionKey: false
+    versionKey: false,
   }
 )
 
