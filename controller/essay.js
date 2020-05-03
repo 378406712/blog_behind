@@ -97,11 +97,16 @@ router.post('/BatchDeleteEssay', function (req, res) {
 })
 // 批量移入回收站
 router.post('/BatchTrashEssay', function (req, res) {
-  const _id = JSON.parse(req.body._id)
+  let _id = JSON.parse(req.body._id)
+  const { tag } = req.body
   let newData = []
-  _id.map((item) => {
-    newData.push(ObjectId(item))
-  })
+  if (tag === 'batch') {
+    _id.map((item) => {
+      newData.push(ObjectId(item))
+    })
+  } else {
+    newData.push(_id)
+  }
 
   Essay.updateMany(
     {
