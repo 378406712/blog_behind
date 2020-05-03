@@ -1,8 +1,7 @@
 ## blog_behind
 毕设博客后台
 
-<p  align="center"><a href="https://qdmmz.cn"><img  style="border-radius: 50%;
-    border: 1px solid #fff;" width="120" src="http://q1.qlogo.cn/g?b=qq&nk=378406712&s=640"></a></p>
+<p  align="center"><a href="https://qdmmz.cn"><img width="120" src="http://q1.qlogo.cn/g?b=qq&nk=378406712&s=640"></a></p>
 <p align="center">基于 NodeJs 和 Express 的后端实现</p>
 <p align="center">后端：node.js </p>
 <p align="center">数据库：mongodb</p>
