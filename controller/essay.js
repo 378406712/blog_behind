@@ -32,12 +32,18 @@ router.get('/get-essay', function (req, res) {
 // 获取搜索的文章
 router.get('/essay-search', function (req, res) {
   const { username, keywords } = req.query
-  const _filter = {
+  let _filter = {
     $or: [
       { title: { $regex: keywords, $options: '$i' } },
-      { date: { $regex: keywords, $options: '$i' } },
+      { checkCategory: { $regex: keywords, $options: '$i' } },
     ],
   }
+  if (req.query.tag) {
+    _filter = {
+      $or: [{ checkCategory: { $regex: keywords, $options: '$i' } }],
+    }
+  }
+
   Essay.where({ username })
     .where(_filter)
     .exec(function (err, docs) {
