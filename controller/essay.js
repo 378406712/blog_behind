@@ -7,7 +7,6 @@ const STATUS = require('../common/const')
 // 获取所有文章
 router.get('/get-essay', function (req, res) {
   const { username, keyword } = req.query
-  console.log(keyword)
   let keywords = {}
   switch (keyword) {
     case 'all':
@@ -91,6 +90,33 @@ router.post('/BatchDeleteEssay', function (req, res) {
     },
     function (err, docs) {
       if (!err) {
+        res.send({ status: STATUS.SUCCESS })
+      }
+    }
+  )
+})
+// 批量移入回收站
+router.post('/BatchTrashEssay', function (req, res) {
+  const _id = JSON.parse(req.body._id)
+  let newData = []
+  _id.map((item) => {
+    newData.push(ObjectId(item))
+  })
+
+  Essay.updateMany(
+    {
+      _id: {
+        $in: newData,
+      },
+    },
+    {
+      $set: {
+        trash: true,
+      },
+    },
+    function (err, docs) {
+      if (!err) {
+        console.log(docs)
         res.send({ status: STATUS.SUCCESS })
       }
     }
