@@ -13,6 +13,7 @@ const Essay = new Schema(
     password: String,
     reCheck: Boolean,
     keepTop: Boolean,
+    commentOn: Boolean,
     draft: Boolean,
     trash: Boolean,
     date: String,

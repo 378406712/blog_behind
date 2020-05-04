@@ -35,6 +35,7 @@ router.get('/essay-search', function (req, res) {
   let _filter = {
     $or: [
       { title: { $regex: keywords, $options: '$i' } },
+      { date: { $regex: keywords, $options: '$i' } },
       { checkCategory: { $regex: keywords, $options: '$i' } },
     ],
   }
