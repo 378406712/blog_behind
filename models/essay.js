@@ -5,6 +5,7 @@ const Essay = new Schema(
   {
     essay: String,
     title: String,
+    radioVisible: String,
     special_bg: String,
     checkCategory: Array,
     essayStatus: String,
@@ -16,6 +17,7 @@ const Essay = new Schema(
     commentOn: Boolean,
     draft: Boolean,
     trash: Boolean,
+    sended: Boolean,
     date: String,
     selectDate: String,
   },
