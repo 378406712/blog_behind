@@ -36,22 +36,40 @@ router.get('/get-essay-new', function (req, res) {
   const { username, id } = req.query
   Essay.find({ username, _id: ObjectId(id) }, function (err, docs) {
     if (!err) {
-      console.log(...docs)
+      //  console.log(...docs)
       res.send(...docs)
     } else {
-      console.log(err)
+      // console.log(err)
     }
   })
 })
-// 提交新文章
+// 提交(更新)新文章
 router.post('/post-new', function (req, res) {
-  Essay.insertMany(req.body, function (err, docs) {
-    if (!err) {
-      res.send({ status: STATUS.SUCCESS })
-    } else {
-      res.send({ status: STATUS.ERROR })
-    }
-  })
+  if (req.body.tag === 'post-new') {
+    Essay.insertMany(req.body, function (err, docs) {
+      if (!err) {
+        res.send({ status: STATUS.SUCCESS })
+      } else {
+        res.send({ status: STATUS.ERROR })
+      }
+    })
+  } else if (req.body.tag === 'update') {
+    // Essay.updateOne(req.body, function (err, docs) {
+    //   if (!err) {
+    //     res.send({ status: STATUS.SUCCESS })
+    //   } else {
+    //     res.send({ status: STATUS.ERROR })
+    //   }
+    // })
+    console.log(req.body)
+    Essay.findByIdAndUpdate(
+      { _id: ObjectId(req.body._id) },
+      req.body,
+      function (err, docs) {
+        console.log(docs,'123123')
+      }
+    )
+  }
 })
 // 目录下文章统计(单条)
 router.post('/category-count', function (req, res) {

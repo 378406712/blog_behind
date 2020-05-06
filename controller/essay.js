@@ -128,7 +128,6 @@ router.post('/BatchTrashEssay', function (req, res) {
     },
     function (err, docs) {
       if (!err) {
-        console.log(docs)
         res.send({ status: STATUS.SUCCESS })
       }
     }
