@@ -19,7 +19,7 @@ const Essay = new Schema(
     trash: Boolean,
     sended: Boolean,
     date: String,
-    selectDate: String,
+    selectDate: String
   },
   {
     versionKey: false,

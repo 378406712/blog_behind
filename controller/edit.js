@@ -11,7 +11,7 @@ const multiparty = require('multiparty') //处理图片上传
 const formidable = require('formidable')
 const STATUS = require('../common/const')
 // 提交富文本中图片
-router.post('/media', function(req, res) {
+router.post('/media', function (req, res) {
   const form = formidable.IncomingForm()
   form.parse(req, (err, fields, files) => {
     const upLoadFile = files.file
@@ -20,9 +20,9 @@ router.post('/media', function(req, res) {
     const oldPath = upLoadFile.path
     const newPath = path.join('./public/media', filename)
     const uploadUrl = `http://localhost:3001/mediaSource/${filename}`
-    fs.rename(oldPath, newPath, err => {
+    fs.rename(oldPath, newPath, (err) => {
       if (!err) {
-        Media.insertMany({ ...fields, file: uploadUrl }, function(err, docs) {
+        Media.insertMany({ ...fields, file: uploadUrl }, function (err, docs) {
           if (!err) {
             res.send(docs)
           }
@@ -31,9 +31,21 @@ router.post('/media', function(req, res) {
     })
   })
 })
+// 获取文章
+router.get('/get-essay-new', function (req, res) {
+  const { username, id } = req.query
+  Essay.find({ username, _id: ObjectId(id) }, function (err, docs) {
+    if (!err) {
+      console.log(...docs)
+      res.send(...docs)
+    } else {
+      console.log(err)
+    }
+  })
+})
 // 提交新文章
-router.post('/post-new', function(req, res) {
-  Essay.insertMany(req.body, function(err, docs) {
+router.post('/post-new', function (req, res) {
+  Essay.insertMany(req.body, function (err, docs) {
     if (!err) {
       res.send({ status: STATUS.SUCCESS })
     } else {
@@ -42,11 +54,11 @@ router.post('/post-new', function(req, res) {
   })
 })
 // 目录下文章统计(单条)
-router.post('/category-count', function(req, res) {
+router.post('/category-count', function (req, res) {
   const { username, checkCategory } = req.body
-  new Promise(resolve => {
-    checkCategory.map(item => {
-      Essay.countDocuments({ username, checkCategory: item }, function(
+  new Promise((resolve) => {
+    checkCategory.map((item) => {
+      Essay.countDocuments({ username, checkCategory: item }, function (
         err,
         count
       ) {
@@ -58,7 +70,7 @@ router.post('/category-count', function(req, res) {
                 sum: count
               }
             },
-            function() {
+            function () {
               resolve()
             }
           )
@@ -66,23 +78,23 @@ router.post('/category-count', function(req, res) {
       })
     })
   }).then(() => {
-    Category.find({ username }, function(err, docs) {
+    Category.find({ username }, function (err, docs) {
       if (!err) res.send(docs)
     })
   })
 })
 // 目录下文章统计(全部)
-router.post('/category-count-all', function(req, res) {
+router.post('/category-count-all', function (req, res) {
   const { username } = req.body
-  Category.where(username).then(data => {
-    new Promise(resolve => {
+  Category.where(username).then((data) => {
+    new Promise((resolve) => {
       let dataArr = []
-      data.map(item => {
+      data.map((item) => {
         dataArr.push(item.category)
       })
-      new Promise(resolve => {
-        dataArr.map(item => {
-          Essay.countDocuments({ username, checkCategory: item }, function(
+      new Promise((resolve) => {
+        dataArr.map((item) => {
+          Essay.countDocuments({ username, checkCategory: item }, function (
             err,
             count
           ) {
@@ -94,7 +106,7 @@ router.post('/category-count-all', function(req, res) {
                     sum: count
                   }
                 },
-                function() {
+                function () {
                   resolve()
                 }
               )
@@ -102,7 +114,7 @@ router.post('/category-count-all', function(req, res) {
           })
         })
       }).then(() => {
-        Category.find({ username }, function(err, docs) {
+        Category.find({ username }, function (err, docs) {
           if (!err) res.send(docs)
         })
       })
@@ -110,20 +122,20 @@ router.post('/category-count-all', function(req, res) {
   })
 })
 // 新增目录
-router.post('/set-category', function(req, res) {
+router.post('/set-category', function (req, res) {
   const { username, category } = req.body
-  Category.findOne({ username, category }, function(err, docs) {
+  Category.findOne({ username, category }, function (err, docs) {
     if (docs && category.category != '未分类') {
       res.send(docs)
     } else if (!err && !docs) {
-      Category.insertMany(req.body, function(err, docs) {
+      Category.insertMany(req.body, function (err, docs) {
         res.send(docs[0])
       })
     }
   })
 })
 // 更改媒体信息
-router.post('/change-media', function(req, res) {
+router.post('/change-media', function (req, res) {
   const { id, identify } = req.body
   if (identify === 'description') {
     Media.findByIdAndUpdate(
@@ -136,7 +148,7 @@ router.post('/change-media', function(req, res) {
       {
         new: true
       },
-      function(err, docs) {
+      function (err, docs) {
         if (!err) {
           res.send(docs)
         }
@@ -153,7 +165,7 @@ router.post('/change-media', function(req, res) {
       {
         new: true
       },
-      function(err, docs) {
+      function (err, docs) {
         if (!err) {
           res.send(docs)
         }
@@ -162,8 +174,8 @@ router.post('/change-media', function(req, res) {
   }
 })
 // 删除媒体文件
-router.post('/media-remove', function(req, res) {
-  Media.findOneAndDelete(req.body, function(err) {
+router.post('/media-remove', function (req, res) {
+  Media.findOneAndDelete(req.body, function (err) {
     if (!err) {
       res.send({ status: STATUS.SUCCESS })
     } else {
@@ -172,38 +184,38 @@ router.post('/media-remove', function(req, res) {
   })
 })
 // 获取目录
-router.get('/get-category', function(req, res) {
-  Category.find(req.query, function(err, docs) {
+router.get('/get-category', function (req, res) {
+  Category.find(req.query, function (err, docs) {
     if (!err) res.send(docs)
   })
 })
 // 获取媒体文件
-router.get('/get-media', function(req, res) {
+router.get('/get-media', function (req, res) {
   const { username, date } = req.query
   if (date === 'all') {
-    Media.find({ username }, function(err, docs) {
+    Media.find({ username }, function (err, docs) {
       if (!err) res.send(docs)
     })
   } else {
-    Media.find({ username, selectDate: date }, function(err, docs) {
+    Media.find({ username, selectDate: date }, function (err, docs) {
       if (!err) res.send(docs)
     })
   }
 })
 // 获取媒体信息
-router.get('/media-detail', function(req, res) {
-  Media.findOne(req.query, function(err, docs) {
+router.get('/media-detail', function (req, res) {
+  Media.findOne(req.query, function (err, docs) {
     if (!err) res.send(docs)
   })
 })
 // 获取媒体信息中的日期
-router.get('/media-date', function(req, res) {
-  Media.find(req.query, function(err, docs) {
+router.get('/media-date', function (req, res) {
+  Media.find(req.query, function (err, docs) {
     if (!err) res.send(docs)
   })
 })
 // 获取筛选的媒体
-router.get('/media-search', function(req, res) {
+router.get('/media-search', function (req, res) {
   const { username, keywords } = req.query
   const _filter = {
     $or: [
@@ -213,19 +225,19 @@ router.get('/media-search', function(req, res) {
   }
   Media.where({ username })
     .where(_filter)
-    .exec(function(err, docs) {
+    .exec(function (err, docs) {
       res.send(docs)
     })
 })
 // 获取筛选的目录
-router.get('/category-search', function(req, res) {
+router.get('/category-search', function (req, res) {
   const { username, keywords } = req.query
   const _filter = {
     $or: [{ category: { $regex: keywords, $options: '$i' } }]
   }
   Category.where({ username })
     .where(_filter)
-    .exec(function(err, docs) {
+    .exec(function (err, docs) {
       res.send(docs)
     })
 })
