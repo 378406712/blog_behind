@@ -54,19 +54,15 @@ router.post('/post-new', function (req, res) {
       }
     })
   } else if (req.body.tag === 'update') {
-    // Essay.updateOne(req.body, function (err, docs) {
-    //   if (!err) {
-    //     res.send({ status: STATUS.SUCCESS })
-    //   } else {
-    //     res.send({ status: STATUS.ERROR })
-    //   }
-    // })
-    console.log(req.body)
     Essay.findByIdAndUpdate(
       { _id: ObjectId(req.body._id) },
       req.body,
       function (err, docs) {
-        console.log(docs,'123123')
+        if (!err) {
+          res.send({ status: STATUS.UPDATE })
+        } else {
+          res.send({ status: STATUS.ERROR })
+        }
       }
     )
   }
