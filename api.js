@@ -10,6 +10,7 @@ const homepage = require('./controller/homepage')
 const edit = require('./controller/edit')
 const category = require('./controller/category')
 const essay = require('./controller/essay')
+const dashboard = require('./controller/dashboard')
 generator()
 //加载upload中图片资源
 app.use('/uploads', express.static(__dirname + '/public/upload'))
@@ -29,6 +30,7 @@ app.use('/account', account)
 app.use('/edit', edit)
 app.use('/category', category)
 app.use('/essay', essay)
+app.use('/dashboard',dashboard)
 // Promise检错提示
 process.on('unhandledRejection', (reason, p) => {
   console.log('Unhandled Rejection at: Promise', p, 'reason:', reason)

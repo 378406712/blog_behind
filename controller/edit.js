@@ -206,6 +206,7 @@ router.get('/get-category', function (req, res) {
 // 获取媒体文件
 router.get('/get-media', function (req, res) {
   const { username, date } = req.query
+  console.log(date)
   if (date === 'all') {
     Media.find({ username }, function (err, docs) {
       if (!err) res.send(docs)
