@@ -18,7 +18,6 @@ router.get('/get-todo', function (req, res) {
   const { username } = req.query
   Dashboard.find({ username }, function (err, docs) {
     if (docs.length !== 0) {
-      console.log(docs)
       res.send(docs)
     }
   })

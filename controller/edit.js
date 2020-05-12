@@ -36,10 +36,9 @@ router.get('/get-essay-new', function (req, res) {
   const { username, id } = req.query
   Essay.find({ username, _id: ObjectId(id) }, function (err, docs) {
     if (!err) {
-      //  console.log(...docs)
       res.send(...docs)
     } else {
-      // console.log(err)
+      return
     }
   })
 })
@@ -206,7 +205,6 @@ router.get('/get-category', function (req, res) {
 // 获取媒体文件
 router.get('/get-media', function (req, res) {
   const { username, date } = req.query
-  console.log(date)
   if (date === 'all') {
     Media.find({ username }, function (err, docs) {
       if (!err) res.send(docs)
