@@ -36,12 +36,12 @@ router.get('/essay-search', function (req, res) {
     $or: [
       { title: { $regex: keywords, $options: '$i' } },
       { date: { $regex: keywords, $options: '$i' } },
-      { checkCategory: { $regex: keywords, $options: '$i' } },
-    ],
+      { checkCategory: { $regex: keywords, $options: '$i' } }
+    ]
   }
   if (req.query.tag) {
     _filter = {
-      $or: [{ checkCategory: { $regex: keywords, $options: '$i' } }],
+      $or: [{ checkCategory: { $regex: keywords, $options: '$i' } }]
     }
   }
 
@@ -62,8 +62,8 @@ router.get('/essay-filter', function (req, res) {
     const _filter = {
       $or: [
         { checkCategory: { $regex: checkCategory, $options: '$i' } },
-        { selectDate: { $regex: date, $options: '$i' } },
-      ],
+        { selectDate: { $regex: date, $options: '$i' } }
+      ]
     }
     Essay.where({ username })
       .where(_filter)
@@ -72,7 +72,7 @@ router.get('/essay-filter', function (req, res) {
       })
   } else {
     const _filter = {
-      $or: [{ checkCategory: { $regex: checkCategory, $options: '$i' } }],
+      $or: [{ checkCategory: { $regex: checkCategory, $options: '$i' } }]
     }
     Essay.where({ username, selectDate: date })
       .where(_filter)
@@ -92,8 +92,8 @@ router.post('/BatchDeleteEssay', function (req, res) {
   Essay.deleteMany(
     {
       _id: {
-        $in: newData,
-      },
+        $in: newData
+      }
     },
     function (err, docs) {
       if (!err) {
@@ -118,13 +118,14 @@ router.post('/BatchTrashEssay', function (req, res) {
   Essay.updateMany(
     {
       _id: {
-        $in: newData,
-      },
+        $in: newData
+      }
     },
     {
       $set: {
         trash: true,
-      },
+        draft: false
+      }
     },
     function (err, docs) {
       if (!err) {
