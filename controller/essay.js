@@ -124,7 +124,9 @@ router.post('/BatchTrashEssay', function (req, res) {
     {
       $set: {
         trash: true,
-        draft: false
+        draft: false,
+        reCheck:false,
+        sended:false
       }
     },
     function (err, docs) {
