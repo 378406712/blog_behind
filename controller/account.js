@@ -90,10 +90,17 @@ router.post('/setAvatar', function (req, res) {
     const postData2 = {
       url: uploadUrl
     }
+
     fs.rename(oldPath, newPath, (err) => {
       User.findOneAndUpdate(
         { username },
         { $set: { avatar: uploadUrl } },
+        { upsert: true, new: true },
+        function (err, data) {}
+      )
+      Personal.findOneAndUpdate(
+        { username },
+        { $set: { url: uploadUrl } },
         { upsert: true, new: true },
         function (err, docs) {
           res.send(docs)
