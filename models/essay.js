@@ -11,6 +11,7 @@ const Essay = new Schema(
     essayStatus: String,
     essayPassword: String,
     username: String,
+    nickname:String,
     password: String,
     reCheck: Boolean,
     keepTop: Boolean,

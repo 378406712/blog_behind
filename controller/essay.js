@@ -7,6 +7,7 @@ const STATUS = require('../common/const')
 // 获取所有文章
 router.get('/get-essay', function (req, res) {
   const { username, keyword } = req.query
+  console.log(username, keyword)
   let keywords = {}
   switch (keyword) {
     case 'all':
@@ -26,6 +27,7 @@ router.get('/get-essay', function (req, res) {
       break
   }
   Essay.find(keywords, function (err, docs) {
+    console.log(docs)
     if (!err) res.send(docs)
   })
 })
@@ -125,8 +127,8 @@ router.post('/BatchTrashEssay', function (req, res) {
       $set: {
         trash: true,
         draft: false,
-        reCheck:false,
-        sended:false
+        reCheck: false,
+        sended: false
       }
     },
     function (err, docs) {
