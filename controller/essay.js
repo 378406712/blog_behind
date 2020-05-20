@@ -7,28 +7,35 @@ const STATUS = require('../common/const')
 // 获取所有文章
 router.get('/get-essay', function (req, res) {
   const { username, keyword } = req.query
-  console.log(username, keyword)
   let keywords = {}
   switch (keyword) {
     case 'all':
-      keywords = { username }
+      keywords = { username,trash: false}
       break
-    case 'trash':
-      keywords = { username, trash: true }
-      break
+      case 'trash':
+        keywords = { username,trash: true}
+        break
     case 'draft':
       keywords = { username, draft: true }
       break
     case 'sended':
-      keywords = { username, reCheck: false, draft: false, trash: false }
+      keywords = { username, sended:true }
       break
     case 'pend':
       keywords = { username, reCheck: true }
-      break
+      break 
   }
   Essay.find(keywords, function (err, docs) {
-    console.log(docs)
     if (!err) res.send(docs)
+  })
+})
+// 获取回收站文章
+router.get('/get-trash-essay', function (req, res) {
+  const {username} = req.query
+  Essay.find({ username, trash: true }, function (err, docs) {
+    if (!err) {
+      res.send(docs)
+    }
   })
 })
 // 获取搜索的文章
