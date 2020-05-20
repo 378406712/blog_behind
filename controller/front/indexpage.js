@@ -29,5 +29,19 @@ router.get('/get-boke-essay', function (req, res) {
   })
 })
 
+// 评论
+router.post('/set-guest-comment', function (req, res) {
+  console.log(req.body)
+  Essay.findByIdAndUpdate(
+    { _id: ObjectId(req.body._id) },
+    { $push: { commentData: req.body } },
+    { new: true },
+    function (err, data) {
+      if (!err) {
+        res.send(data)
+      }
+    }
+  )
+})
 //暴露路由
 module.exports = router

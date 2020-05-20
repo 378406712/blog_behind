@@ -11,7 +11,7 @@ const Essay = new Schema(
     essayStatus: String,
     essayPassword: String,
     username: String,
-    nickname:String,
+    nickname: String,
     password: String,
     reCheck: Boolean,
     keepTop: Boolean,
@@ -20,10 +20,11 @@ const Essay = new Schema(
     trash: Boolean,
     sended: Boolean,
     date: String,
+    commentData: Array,
     selectDate: String
   },
   {
-    versionKey: false,
+    versionKey: false
   }
 )
 
