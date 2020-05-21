@@ -21,7 +21,6 @@ router.get('/get-boke-essay', function (req, res) {
           .exec(function (err, next) {
             if (!err) {
               arr.push({ next })
-              console.log(arr)
               res.send(arr)
             }
           })
@@ -44,12 +43,9 @@ router.post('/set-guest-comment', function (req, res) {
 // 搜索
 router.get('/search-essay', function (req, res) {
   const { username, words } = req.query
-  console.log(words)
   if (words === '') {
-    console.log(1)
     Essay.find({ username, sended: true }, function (err, docs) {
       res.send(docs)
-      console.log(docs)
     })
   } else {
     const _filter = {
@@ -62,7 +58,6 @@ router.get('/search-essay', function (req, res) {
       .where(_filter)
       .exec(function (err, docs) {
         res.send(docs)
-        console.log(docs)
       })
   }
 })
