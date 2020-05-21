@@ -16,7 +16,7 @@ router.get('/get-essay', function (req, res) {
         keywords = { username,trash: true}
         break
     case 'draft':
-      keywords = { username, draft: true }
+      keywords = { username, draft: true,trash: false }
       break
     case 'sended':
       keywords = { username, sended:true }
