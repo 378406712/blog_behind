@@ -28,10 +28,8 @@ router.get('/get-boke-essay', function (req, res) {
       })
   })
 })
-
 // 评论
 router.post('/set-guest-comment', function (req, res) {
-  console.log(req.body)
   Essay.findByIdAndUpdate(
     { _id: ObjectId(req.body._id) },
     { $push: { commentData: req.body } },
@@ -42,6 +40,21 @@ router.post('/set-guest-comment', function (req, res) {
       }
     }
   )
+})
+// 搜索
+router.get('/search-essay', function (req, res) {
+  const { username, words } = req.query
+  const _filter = {
+    $or: [
+      { title: { $regex: words, $options: '$i' } },
+      { essay: { $regex: words, $options: '$i' } }
+    ]
+  }
+  Essay.where({ username }, { sended: true })
+    .where(_filter)
+    .exec(function (err, docs) {
+      res.send(docs)
+    })
 })
 //暴露路由
 module.exports = router
