@@ -44,17 +44,27 @@ router.post('/set-guest-comment', function (req, res) {
 // 搜索
 router.get('/search-essay', function (req, res) {
   const { username, words } = req.query
-  const _filter = {
-    $or: [
-      { title: { $regex: words, $options: '$i' } },
-      { essay: { $regex: words, $options: '$i' } }
-    ]
-  }
-  Essay.where({ username }, { sended: true })
-    .where(_filter)
-    .exec(function (err, docs) {
+  console.log(words)
+  if (words === '') {
+    console.log(1)
+    Essay.find({ username, sended: true }, function (err, docs) {
       res.send(docs)
+      console.log(docs)
     })
+  } else {
+    const _filter = {
+      $or: [
+        { title: { $regex: words, $options: '$i' } },
+        { essay: { $regex: words, $options: '$i' } }
+      ]
+    }
+    Essay.where({ username }, { sended: true })
+      .where(_filter)
+      .exec(function (err, docs) {
+        res.send(docs)
+        console.log(docs)
+      })
+  }
 })
 //暴露路由
 module.exports = router
