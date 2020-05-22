@@ -61,5 +61,12 @@ router.get('/search-essay', function (req, res) {
       })
   }
 })
+//获取归档
+router.get('/time-axis', function (req, res) {
+  console.log(req.query)
+  Essay.find(req.query,function(err,docs){
+    res.send(docs)
+  })
+})
 //暴露路由
 module.exports = router

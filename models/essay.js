@@ -20,6 +20,7 @@ const Essay = new Schema(
     trash: Boolean,
     sended: Boolean,
     date: String,
+    time: String,
     commentData: Array,
     selectDate: String
   },
