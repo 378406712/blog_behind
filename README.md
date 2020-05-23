@@ -32,91 +32,130 @@
 
 ## 写在前面
 
- 请确保你安装了 [node](https://nodejs.org/en/) 和 [git](https://git-scm.com/)，[mongodb]( https://www.mongodb.com/ )
+该后端为[myBlogDesign-2.0](https://github.com/378406712/myBlogDesign-2.0)的后端环境,需要配合其使用。
 
-数据库名：myBlog-> cmd下use myBlog即可
+请确保你安装了 [node](https://nodejs.org/en/) 和 [git](https://git-scm.com/)，[mongodb]( https://www.mongodb.com/ )
 
-## 目录结构
+数据库安装过程：[install Mongoodb](https://github.com/378406712/blog_behind/blob/mac/%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B.doc)
+
+## 构建运行
+
+```bash
+# 克隆项目
+git clone https://github.com/378406712/blog_behind
+
+# 进入项目
+cd blog_behind
+
+# install dependencies
+npm install
+
+# install supervisor
+npm install -g supervisor
+
+# serve with hot reload at localhost:3001
+supervisor api.js
+```
+
+## 项目结构
+
+### models
 
 ```
-models
+
 ├─category.js
+├─dashboard.js
 ├─devices.js
 ├─essay.js
 ├─media.js
 ├─personals.js
-└users.js
+└─users.js
 ```
 
-
+### controller
 
 ```
-controller
+├─front
+	├─indexpage.js //前台所有接口
 ├─account.js
 ├─category.js
+├─dashboard.js
 ├─edit.js
+├─essay.js
 ├─homepage.js
 ├─publicKey.js
-└user.js
+└─user.js
 ```
-
-
 
 ## Api接口
 
-| account.js   |              |
+| account.js   | **账户逻辑** |
 | ------------ | :----------: |
 | /userInfoAdd | 添加用户信息  |
 | /userInfoGet | 获取用户信息  |
-
-| **category.js**      |                  |
-| -------------------- | ---------------- |
-| /get-essay           | 获取文章信息     |
-| /BatchDeleteCategory | 批量删除目录     |
-| /get-categoryDetail  | 获取详细目录信息 |
-| /alter-category      | 更新目录         |
-
-| edit.js             |                      |
-| ------------------- | -------------------- |
-| /media              | 提交富文本中图片     |
-| /post-new           | 提交新文章           |
-| /category-count     | 目录下文章统计(单条) |
+| **category.js** | **目录逻辑** |
+| /get-essay | 获取文章信息 |
+| /BatchDeleteCategory | 批量删除目录 |
+| /get-categoryDetail | 获取详细目录信息 |
+| /alter-category | 更新目录 |
+| **edit.js** | **文章编辑逻辑** |
+| /media | 提交富文本中图片 |
+| /post-new | 提交新文章 |
+| /category-count | 目录下文章统计(单条) |
 | /category-count-all | 目录下文章统计(全部) |
-| /set-category       | 新增目录             |
-| /change-media       | 更改媒体信息         |
-| /media-remove       | 删除媒体文件         |
-| /get-category       | 获取目录             |
-| /get-media          | 获取媒体文件         |
-| /media-detail       | 获取媒体信息         |
-| /media-date         | 获取媒体信息中的日期 |
-| /media-search       | 获取筛选的媒体       |
-| /category-search    | 获取筛选的目录       |
+| /set-category | 新增目录 |
+| /change-media | 更改媒体信息 |
+| /media-remove | 删除媒体文件 |
+| /get-category | 获取目录 |
+| /get-media | 获取媒体文件 |
+| **homepage.js** | **用户中心页逻辑** |
+| /getDevices | 获取用户系统信息 |
+| /deleteDevice | 删除用户系统信息(单条) |
+| /BatchDeleteDevices | 批量删除用户系统信息 |
+| **user.js** | **用户资料逻辑** |
+| /register | 用户注册 |
+| /login | 用户登录 |
+| /logout | 用户登出 |
+| /DeviceInfo | 存入设备信息 |
+| /getInfo | 获取用户登陆信息 |
+| /passAlter | 修改用户密码 |
+| /userRemove | 删除用户账号 |
+| **publicKey.js** | **公钥** |
+| /getPublicKey | 获取公钥 |
+| **dashboard.js** | **仪表盘页面** |
+| /set-todo | 变更当前任务 |
+| /get-todo | 获取当前任务 |
+| **essay.js** | **文章页面逻辑** |
+| /get-essay | 获取所有文章（非回收站中） |
+| /get-trash-essay | 获取回收站文章 |
+| /essay-search | 获取搜索的文章 |
+| /essay-filter | 获取筛选的文章 |
+| /BatchDeleteEssay | 批量删除文章 |
+| /BatchTrashEssay | 批量移入回收站 |
+| /essay-date | 获取文章信息中的日期 |
+| **indexpage** | **前台所有逻辑** |
+| /get-boke-essay | 获取文章 |
+| /set-guest-comment | 获取评论 |
+| /time-axis | 获取归档 |
+| /search-essay | 搜索文章 |
 
-| homepage.js         |                        |
-| ------------------- | ---------------------- |
-| /getDevices         | 获取用户系统信息       |
-| /deleteDevice       | 删除用户系统信息(单条) |
-| /BatchDeleteDevices | 批量删除用户系统信息   |
-
-| user.js     |                  |
-| ----------- | ---------------- |
-| /register   | 用户注册         |
-| /login      | 用户登录         |
-| /logout     | 用户登出         |
-| /DeviceInfo | 存入设备信息     |
-| /getInfo    | 获取用户登陆信息 |
-| /passAlter  | 修改用户密码     |
-| /userRemove | 删除用户账号     |
-
-## 构建启动
+## 数据库运行
 
 ```
-# 启动（热加载）
-supervisor api.js
-
 # 数据库本地启动
 mongod
 monogo
+
+# 推荐安装使用Robo3T 图形化管理 Mongodb
+```
+
+### 其他
+
+```
+	由于后端一开始未使用MVC架构，导致前端多次请求接口容易发生系统崩溃。
+后期我重构过一次，也使用了大量Moogoose的Api，所有可能出现部分接口有原生的Api写法，也有Moogoose的Api。
+	这是我第一次做后端以及使用非关系型数据库Mongodb，自知有很多不足。
+	希望通过在未来学习与实践中，让自己变得更加强大!
 ```
 
 ## License
